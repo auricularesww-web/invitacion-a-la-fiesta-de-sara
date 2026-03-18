@@ -234,7 +234,7 @@
 
         <!-- Vista de Invitado -->
         <div id="guestView" style="display: none;">
-            <h1>🎂 !te invito a mis 15 Sara!</h1>
+            <h1>🎂 ¡Te invito a mis 15 Sara!</h1>
             <p class="subtitle">¡Confirma tu asistencia!</p>
             
             <button class="btn" id="confirmBtn">✅ Confirmar Asistencia</button>
@@ -269,58 +269,50 @@
             <h1>🔐 Panel Administrador</h1>
             <div class="admin-list">
                 <h3>📋 Confirmados (<span id="totalConfirmed">0</span>)</h3>
-                <div id="confirmedList"></div>
+                <div id="confirmedList">Cargando...</div>
             </div>
             <div class="admin-list">
                 <h3>🥗 Dietas Especiales (<span id="totalDiets">0</span>)</h3>
-                <div id="dietList"></div>
+                <div id="dietList">Cargando...</div>
             </div>
             <button class="btn" onclick="clearAllData()" style="background: #dc3545; width: 200px;">🗑️ Limpiar Todo</button>
             <button class="btn" onclick="backToWelcome()" style="background: #6c757d; width: 200px; margin-left: 10px;">← Salir</button>
         </div>
     </div>
 
+    <!-- 🔥 FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <script>
+        // 🔥 TUS CREDENCIALES DE FIREBASE (¡FUNCIONAN PERFECTO!)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
+            authDomain: "cumple-de-sara.firebaseapp.com",
+            databaseURL: "https://cumple-de-sara-default-rtdb.firebaseio.com",
+            projectId: "cumple-de-sara",
+            storageBucket: "cumple-de-sara.firebasestorage.app",
+            messagingSenderId: "552258745730",
+            appId: "1:552258745730:web:e9fe5ec73e1dbf7bcb4b9b"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Referencias a la base de datos
+        const guestsRef = db.ref('confirmedGuests');
+        const dietsRef = db.ref('specialDiets');
+        let currentGuest = null;
+
         // CONTRASEÑA ADMIN
         const ADMIN_PASSWORD = "Sara2026";
-        
-       
-const firebaseConfig = {
-  apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
-  authDomain: "cumple-de-sara.firebaseapp.com",
-  databaseURL: "https://cumple-de-sara-default-rtdb.firebaseio.com",
-  projectId: "cumple-de-sara",
-  storageBucket: "cumple-de-sara.firebasestorage.app",
-  messagingSenderId: "552258745730",
-  appId: "1:552258745730:web:e9fe5ec73e1dbf7bcb4b9b"
-};
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-    };
+        // 🔥 SINCRONIZACIÓN EN TIEMPO REAL
+        guestsRef.on('value', updateAdminLists);
+        dietsRef.on('value', updateAdminLists);
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const ADMIN_PASSWORD = "Sara2026";
-    const guestsRef = db.ref('confirmedGuests');
-    const dietsRef = db.ref('specialDiets');
-    const bgRef = db.ref('backgroundUrl');
-    
-    let currentGuest = null;
-    let currentBg = '';
-
-    // 🔥 Sincronización en tiempo real
-    guestsRef.on('value', updateAdminLists);
-    dietsRef.on('value', updateAdminLists);
-    bgRef.on('value', (snapshot) => {
-        currentBg = snapshot.val() || '';
-        if (currentBg) document.body.style.backgroundImage = `url(${currentBg})`;
-    });
-
-
-        // Pantalla de bienvenida
+        // Navegación
         function backToWelcome() {
             document.getElementById('welcomeScreen').style.display = 'block';
             document.getElementById('adminPasswordScreen').style.display = 'none';
@@ -329,20 +321,18 @@ const app = initializeApp(firebaseConfig);
             resetForms();
         }
 
-        // Mostrar formulario contraseña admin
         function showAdminPassword() {
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('adminPasswordScreen').style.display = 'block';
         }
 
-        // Verificar contraseña admin
         function checkAdminPassword() {
             const password = document.getElementById('adminPassword').value;
             if (password === ADMIN_PASSWORD) {
                 document.getElementById('adminPasswordScreen').style.display = 'none';
                 document.getElementById('adminView').style.display = 'block';
-                updateAdminLists();
                 document.getElementById('adminPassword').value = '';
+                updateAdminLists();
             } else {
                 document.getElementById('passwordError').style.display = 'block';
                 setTimeout(() => {
@@ -351,13 +341,11 @@ const app = initializeApp(firebaseConfig);
             }
         }
 
-        // Vista invitado
         function showGuestView() {
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('guestView').style.display = 'block';
         }
 
-        // Resetear formularios
         function resetForms() {
             document.getElementById('confirmBtn').style.display = 'block';
             document.getElementById('nameForm').classList.remove('active');
@@ -369,37 +357,39 @@ const app = initializeApp(firebaseConfig);
             currentGuest = null;
         }
 
-        // Confirmar asistencia
+        // Event listeners
         document.getElementById('confirmBtn').onclick = function() {
             document.getElementById('confirmBtn').style.display = 'none';
             document.getElementById('nameForm').classList.add('active');
         };
 
-        // Enter en contraseña admin
         document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                checkAdminPassword();
-            }
+            if (e.key === 'Enter') checkAdminPassword();
         });
 
-        // Guardar invitado
+        // 🔥 GUARDAR INVITADO (FIREBASE)
         function saveGuest() {
             const name = document.getElementById('fullName').value.trim();
             if (name) {
-                currentGuest = name;
-                confirmedGuests.push(name);
-                localStorage.setItem('confirmedGuests', JSON.stringify(confirmedGuests));
-                
-                document.getElementById('savedName').textContent = name;
-                document.getElementById('successMsg').style.display = 'block';
-                document.getElementById('nameForm').classList.remove('active');
-                document.getElementById('mainButtons').style.display = 'block';
+                // Verificar si ya existe
+                guestsRef.once('value').then((snapshot) => {
+                    const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
+                    if (!guests.includes(name)) {
+                        guestsRef.push(name);
+                        currentGuest = name;
+                        document.getElementById('savedName').textContent = name;
+                        document.getElementById('successMsg').style.display = 'block';
+                        document.getElementById('nameForm').classList.remove('active');
+                        document.getElementById('mainButtons').style.display = 'block';
+                    } else {
+                        alert('✅ ¡Ya estás confirmado!');
+                    }
+                });
             } else {
                 alert('Por favor, escribe tu nombre completo');
             }
         }
 
-        // Dieta especial
         function showDietForm() {
             document.getElementById('dietForm').classList.add('active');
         }
@@ -408,54 +398,57 @@ const app = initializeApp(firebaseConfig);
             document.getElementById('dietForm').classList.remove('active');
         }
 
+        // 🔥 GUARDAR DIETA (FIREBASE)
         function saveDiet() {
             const diet = document.getElementById('dietInfo').value.trim();
             if (diet && currentGuest) {
-                specialDiets.push(`${currentGuest}: ${diet}`);
-                localStorage.setItem('specialDiets', JSON.stringify(specialDiets));
+                dietsRef.push(`${currentGuest}: ${diet}`);
                 alert('✅ ¡Dieta especial guardada!');
                 document.getElementById('dietForm').classList.remove('active');
                 document.getElementById('dietInfo').value = '';
-            } else if (!diet) {
+            } else {
                 alert('Por favor, describe tu dieta especial');
             }
         }
 
-        // 🗺️ UBICACIÓN ACTUALIZADA
         function openMaps() {
             window.open('https://maps.app.goo.gl/E7KchiZa2uGNqmCW6?g_st=ac', '_blank');
         }
 
-        // Panel admin
+        // 🔥 ACTUALIZAR LISTAS ADMIN (TIEMPO REAL)
         function updateAdminLists() {
-            document.getElementById('confirmedList').innerHTML = confirmedGuests.length 
-                ? confirmedGuests.map((name, index) => `<div class="guest-item">${index + 1}. ${name}</div>`).join('')
-                : '<div class="guest-item">👤 No hay confirmaciones aún</div>';
-            
-            document.getElementById('dietList').innerHTML = specialDiets.length 
-                ? specialDiets.map((diet, index) => `<div class="guest-item">${index + 1}. ${diet}</div>`).join('')
-                : '<div class="guest-item">🥗 No hay dietas especiales</div>';
-            
-            document.getElementById('totalConfirmed').textContent = confirmedGuests.length;
-            document.getElementById('totalDiets').textContent = specialDiets.length;
+            // Invitados
+            guestsRef.once('value').then((snapshot) => {
+                const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
+                document.getElementById('totalConfirmed').textContent = guests.length;
+                document.getElementById('confirmedList').innerHTML = guests.length 
+                    ? guests.map((name, index) => `<div class="guest-item">${index + 1}. 👤 ${name}</div>`).join('')
+                    : '<div class="guest-item">👤 No hay confirmaciones aún</div>';
+            });
+
+            // Dietas
+            dietsRef.once('value').then((snapshot) => {
+                const diets = snapshot.val() ? Object.values(snapshot.val()) : [];
+                document.getElementById('totalDiets').textContent = diets.length;
+                document.getElementById('dietList').innerHTML = diets.length 
+                    ? diets.map((diet, index) => `<div class="guest-item">${index + 1}. 🥗 ${diet}</div>`).join('')
+                    : '<div class="guest-item">🥗 No hay dietas especiales</div>';
+            });
         }
 
+        // 🔥 LIMPIAR DATOS (FIREBASE)
         function clearAllData() {
             if (confirm('⚠️ ¿Eliminar TODOS los datos de confirmaciones?')) {
-                confirmedGuests = [];
-                specialDiets = [];
-                localStorage.removeItem('confirmedGuests');
-                localStorage.removeItem('specialDiets');
-                updateAdminLists();
+                guestsRef.remove();
+                dietsRef.remove();
                 alert('🗑️ Datos eliminados correctamente');
             }
         }
 
-        // Cambiar fondo con parámetro URL (opcional)
+        // Fondo con parámetro URL
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('bg')) {
             document.body.style.backgroundImage = `url(${urlParams.get('bg')})`;
-            document.body.style.backgroundSize = 'cover';
         }
     </script>
 </body>
