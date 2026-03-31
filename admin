@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Panel Administrador - Fiesta de 15</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            background-size: cover;
+            background-attachment: fixed;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #d63384;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #6c757d;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .admin-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .admin-list {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .admin-list h3 {
+            color: #d63384;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .guest-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #d63384;
+            font-size: 1.1em;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #d63384, #e91e63);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(214, 51, 132, 0.3);
+            width: 250px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(214, 51, 132, 0.4);
+        }
+
+        .btn.danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            width: 200px;
+        }
+
+        .btn.back {
+            background: #6c757d;
+            width: 200px;
+        }
+
+        .password-form {
+            margin: 20px 0;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr
