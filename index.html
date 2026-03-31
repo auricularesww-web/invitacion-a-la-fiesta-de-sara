@@ -276,6 +276,17 @@
         const guestsRef = db.ref('confirmedGuests');
         const dietsRef = db.ref('specialDiets');
         let currentGuest = null;
+        // 🔥 FONDO DESDE FIREBASE
+const bgRef = db.ref('backgroundUrl');
+bgRef.on('value', (snapshot) => {
+    const url = snapshot.val();
+    if (url) {
+        document.body.style.backgroundImage = `url(${url})`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundAttachment = 'fixed';
+    }
+});
         let selectedDiet = null;
 
         // Navegación
@@ -375,18 +386,8 @@
 
         function openMaps() {
             window.open('https://maps.app.goo.gl/E7KchiZa2uGNqmCW6?g_st=ac', '_blank');
+       
         }
-        // 🔥 LEER FONDO DESDE FIREBASE (AGREGAR ESTO)
-const bgRef = db.ref('backgroundUrl');
-bgRef.on('value', (snapshot) => {
-    const url = snapshot.val();
-    if (url) {
-        document.body.style.backgroundImage = `url(${url})`;
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundPosition = 'center';
-        document.body.style.backgroundAttachment = 'fixed';
-    }
-});
     </script>
 </body>
 </html>
