@@ -18,6 +18,7 @@
             background-size: cover;
             background-attachment: fixed;
             padding: 20px;
+            transition: background-image 0.5s ease;
         }
 
         .container {
@@ -94,7 +95,8 @@
             margin: 10px;
             transition: all 0.3s ease;
             box-shadow: 0 10px 20px rgba(214, 51, 132, 0.3);
-            width: 250px;
+            width: 280px;
+            max-width: 90%;
         }
 
         .btn:hover:not(:disabled) {
@@ -107,25 +109,236 @@
             width: 200px;
         }
 
-        .btn.back {
+        .btn.back, .btn.secondary {
             background: #6c757d;
             width: 200px;
         }
 
+        .btn.photo {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            width: 320px;
+            font-size: 1.2em;
+        }
+
         .password-form {
+            margin: 40px 0;
+        }
+
+        .error, .success {
+            padding: 15px;
+            border-radius: 10px;
             margin: 20px 0;
+            font-size: 1.1em;
+            display: none;
         }
 
         .error {
             background: #f8d7da;
             color: #721c24;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            display: none;
-            font-size: 1.1em;
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        #currentBg {
+            margin: 20px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        @media (max-width: 768px) {
+            .btn { width: 100%; max-width: none; }
+            .admin-list { max-height: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Formulario contraseña admin -->
+        <div id="adminPasswordScreen">
+            <h1>🔐 Acceso Administrador</h1>
+            <div class="password-form">
+                <input type="password" id="adminPassword" placeholder="Ingresa la contraseña" maxlength="20">
+                <button class="btn" onclick="checkAdminPassword()">Acceder</button>
+                <div class="error" id="passwordError">❌ Contraseña incorrecta</div>
+            </div>
+        </div>
+
+        <!-- Vista de Administrador -->
+        <div id="adminView" style="display: none;">
+            <h1>🔐 Panel Administrador</h1>
+            <p class="subtitle">Control total de la fiesta 🎉</p>
+
+            <!-- NUEVO: Sección de Fondo -->
+            <div class="admin-section">
+                <h3>🖼️ Cambiar Fondo de la Fiesta</h3>
+                <div id="currentBg">Fondo actual: Gradiente rosa por defecto</div>
+                <div class="file-input-wrapper">
+                    <input type="file" id="bgPhoto" class="file-input" accept="image/*">
+                    <button class="btn photo" onclick="document.getElementById('bgPhoto').click()">
+                        📸 Elegir Foto de Galería
+                    </button>
+                </div>
+                <div class="success" id="photoSuccess">✅ ¡Foto de fondo actualizada!</div>
+            </div>
+
+            <!-- Listas de invitados y dietas -->
+            <div class="admin-list">
+                <h3>📋 Confirmados (<span id="totalConfirmed">0</span>)</h3>
+                <div id="confirmedList">Cargando...</div>
+            </div>
+            
+            <div class="admin-list">
+                <h3>🥗 Dietas Especiales (<span id="totalDiets">0</span>)</h3>
+                <div id="dietList">Cargando...</div>
+            </div>
+
+            <!-- Botones de acción -->
+            <button class="btn danger" onclick="clearAllData()">🗑️ Limpiar Todo</button>
+            <button class="btn back" onclick="logout()">← Salir</button>
+        </div>
+    </div>
+
+    <!-- 🔥 FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <script>
+        // 🔥 CONFIGURACIÓN FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
+            authDomain: "cumple-de-sara.firebaseapp.com",
+            databaseURL: "https://cumple-de-sara-default-rtdb.firebaseio.com",
+            projectId: "cumple-de-sara",
+            storageBucket: "cumple-de-sara.firebasestorage.app",
+            messagingSenderId: "552258745730",
+            appId: "1:552258745730:web:e9fe5ec73e1dbf7bcb4b9b"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const storage = firebase.storage();
+
+        // Referencias
+        const guestsRef = db.ref('confirmedGuests');
+        const dietsRef = db.ref('specialDiets');
+        const bgRef = db.ref('backgroundUrl');
+        const ADMIN_PASSWORD = "Sara2026";
+
+        // SINCRONIZACIÓN EN TIEMPO REAL
+        guestsRef.on('value', updateAdminLists);
+        dietsRef.on('value', updateAdminLists);
+        bgRef.on('value', (snapshot) => {
+            const url = snapshot.val();
+            if (url) {
+                document.body.style.backgroundImage = `url(${url})`;
+                document.getElementById('currentBg').textContent = `Fondo actual: ${url}`;
+            }
+        });
+
+        // VER FONDO ACTUAL AL CARGAR
+        window.onload = function() {
+            bgRef.once('value').then((snapshot) => {
+                const url = snapshot.val();
+                if (url) {
+                    document.getElementById('currentBg').textContent = `Fondo actual: ${url}`;
+                }
+            });
+        };
+
+        // CONTRASEÑA ADMIN
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('adminPasswordScreen').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+                updateAdminLists();
+            } else {
+                document.getElementById('passwordError').style.display = 'block';
+                setTimeout(() => document.getElementById('passwordError').style.display = 'none', 3000);
+            }
+        }
+
+        // SUBIR FOTO DE FONDO
+        document.getElementById('bgPhoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const storageRef = storage.ref('backgrounds/' + file.name);
+                const uploadTask = storageRef.put(file);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => { /* Progreso */ },
+                    (error) => { alert('❌ Error: ' + error.message); },
+                    () => {
+                        storageRef.getDownloadURL().then((url) => {
+                            bgRef.set(url);
+                            document.getElementById('photoSuccess').style.display = 'block';
+                            setTimeout(() => {
+                                document.getElementById('photoSuccess').style.display = 'none';
+                            }, 3000);
+                            document.getElementById('currentBg').textContent = `Fondo actual: ${url}`;
+                        });
+                    }
+                );
+            }
+        });
+
+        // ACTUALIZAR LISTAS
+        function updateAdminLists() {
+            guestsRef.once('value').then((snapshot) => {
+                const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
+                document.getElementById('totalConfirmed').textContent = guests.length;
+                document.getElementById('confirmedList').innerHTML = guests.length 
+                    ? guests.map((name, i) => `<div class="guest-item">${i+1}. 👤 ${name}</div>`).join('')
+                    : '<div class="guest-item">👤 No hay confirmaciones aún</div>';
+            });
+
+            dietsRef.once('value').then((snapshot) => {
+                const diets = snapshot.val() ? Object.values(snapshot.val()) : [];
+                document.getElementById('totalDiets').textContent = diets.length;
+                document.getElementById('dietList').innerHTML = diets.length 
+                    ? diets.map((diet, i) => `<div class="guest-item">${i+1}. 🥗 ${diet}</div>`).join('')
+                    : '<div class="guest-item">🥗 No hay dietas especiales</div>';
+            });
+        }
+
+        // LIMPIAR DATOS
+        function clearAllData() {
+            if (confirm('⚠️ ¿Eliminar TODOS los datos?')) {
+                guestsRef.remove();
+                dietsRef.remove();
+                alert('🗑️ Datos eliminados');
+            }
+        }
+
+        // SALIR
+        function logout() {
+            document.getElementById('adminView').style.display = 'none';
+            document.getElementById('adminPasswordScreen').style.display = 'block';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        // ENTER EN CONTRASEÑA
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkAdminPassword();
+        });
+    </script>
+</body>
+</html>
