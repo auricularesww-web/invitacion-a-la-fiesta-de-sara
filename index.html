@@ -21,6 +21,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            transition: background-image 0.5s ease;
         }
 
         .container {
@@ -151,7 +152,6 @@
             box-shadow: 0 10px 20px rgba(0,123,255,0.3);
         }
 
-        /* Estilos para opciones de dieta */
         .diet-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -183,21 +183,14 @@
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-            h1 {
-                font-size: 2em;
-            }
-            .diet-options {
-                grid-template-columns: 1fr;
-            }
+            .container { padding: 30px 20px; }
+            h1 { font-size: 2em; }
+            .diet-options { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="container" id="mainContainer">
-        <!-- Pantalla principal -->
         <div id="welcomeScreen">
             <h1>🎂 ¡Te invito a mis 15 Sara!</h1>
             <p class="subtitle">¡Confirma tu asistencia a la fiesta más increíble!</p>
@@ -206,10 +199,12 @@
                 <a href="#" class="link-btn" onclick="showGuestView()">
                     🎉 ENTRAR COMO INVITADO
                 </a>
+                <a href="admin.html" class="link-btn" target="_blank">
+                    🔐 PANEL ADMINISTRADOR
+                </a>
             </div>
         </div>
 
-        <!-- Vista de Invitado -->
         <div id="guestView" style="display: none;">
             <h1>🎂 ¡Te invito a mis 15 el dia 8 de julio desde las 21hs hasta las 5 a.m!</h1>
             <p class="subtitle">¡Confirma tu asistencia!</p>
@@ -232,22 +227,13 @@
                 <button class="btn" onclick="backToWelcome()" style="background: #6c757d;">← Volver</button>
             </div>
 
-            <!-- Formulario Dieta Especial con opciones -->
             <div class="form-group" id="dietForm">
                 <p>¿Cuál es tu dieta especial?</p>
                 <div class="diet-options">
-                    <div class="diet-option" onclick="selectDiet('Celiaca')" data-diet="Celiaca">
-                        🌾 Celiaca
-                    </div>
-                    <div class="diet-option" onclick="selectDiet('Vegetariana')" data-diet="Vegetariana">
-                        🥬 Vegetariana
-                    </div>
-                    <div class="diet-option" onclick="selectDiet('Sin TACC')" data-diet="Sin TACC">
-                        ❌ Sin TACC
-                    </div>
-                    <div class="diet-option" onclick="selectDiet('Ninguna')" data-diet="Ninguna">
-                        ✅ Ninguna
-                    </div>
+                    <div class="diet-option" onclick="selectDiet('Celiaca')" data-diet="Celiaca">🌾 Celiaca</div>
+                    <div class="diet-option" onclick="selectDiet('Vegetariana')" data-diet="Vegetariana">🥬 Vegetariana</div>
+                    <div class="diet-option" onclick="selectDiet('Sin TACC')" data-diet="Sin TACC">❌ Sin TACC</div>
+                    <div class="diet-option" onclick="selectDiet('Ninguna')" data-diet="Ninguna">✅ Ninguna</div>
                 </div>
                 <button class="btn" id="saveDietBtn" onclick="saveDiet()" disabled>Guardar Dieta</button>
                 <button class="btn" onclick="hideDietForm()" style="background: #6c757d;">Cancelar</button>
@@ -260,7 +246,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // 🔥 TUS CREDENCIALES DE FIREBASE
+        // 🔥 CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
             authDomain: "cumple-de-sara.firebaseapp.com",
@@ -275,18 +261,20 @@
         const db = firebase.database();
         const guestsRef = db.ref('confirmedGuests');
         const dietsRef = db.ref('specialDiets');
+        
+        // 🔥 FONDO DESDE FIREBASE (NUEVO!)
+        const bgRef = db.ref('backgroundUrl');
+        bgRef.on('value', (snapshot) => {
+            const url = snapshot.val();
+            if (url) {
+                document.body.style.backgroundImage = `url(${url})`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundAttachment = 'fixed';
+            }
+        });
+        
         let currentGuest = null;
-        // 🔥 FONDO DESDE FIREBASE
-const bgRef = db.ref('backgroundUrl');
-bgRef.on('value', (snapshot) => {
-    const url = snapshot.val();
-    if (url) {
-        document.body.style.backgroundImage = `url(${url})`;
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundPosition = 'center';
-        document.body.style.backgroundAttachment = 'fixed';
-    }
-});
         let selectedDiet = null;
 
         // Navegación
@@ -310,23 +298,17 @@ bgRef.on('value', (snapshot) => {
             document.getElementById('fullName').value = '';
             selectedDiet = null;
             document.getElementById('saveDietBtn').disabled = true;
-            document.querySelectorAll('.diet-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
+            document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
         }
 
-        // Event listeners
         document.getElementById('confirmBtn').onclick = function() {
             document.getElementById('confirmBtn').style.display = 'none';
             document.getElementById('nameForm').classList.add('active');
         };
 
-        // Seleccionar dieta
         function selectDiet(diet) {
             selectedDiet = diet;
-            document.querySelectorAll('.diet-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
+            document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
             event.target.classList.add('selected');
             document.getElementById('saveDietBtn').disabled = false;
         }
@@ -343,12 +325,9 @@ bgRef.on('value', (snapshot) => {
         function resetDietSelection() {
             selectedDiet = null;
             document.getElementById('saveDietBtn').disabled = true;
-            document.querySelectorAll('.diet-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
+            document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
         }
 
-        // GUARDAR INVITADO
         function saveGuest() {
             const name = document.getElementById('fullName').value.trim();
             if (name) {
@@ -370,14 +349,14 @@ bgRef.on('value', (snapshot) => {
             }
         }
 
-        // GUARDAR DIETA
         function saveDiet() {
-            if (selectedDiet && selectedDiet !== 'Ninguna' && currentGuest) {
-                dietsRef.push(`${currentGuest}: ${selectedDiet}`);
-                alert('✅ ¡Dieta especial guardada!');
-                hideDietForm();
-            } else if (selectedDiet === 'Ninguna') {
-                alert('✅ ¡Perfecto! No tienes restricciones dietéticas.');
+            if (selectedDiet && currentGuest) {
+                if (selectedDiet !== 'Ninguna') {
+                    dietsRef.push(`${currentGuest}: ${selectedDiet}`);
+                    alert('✅ ¡Dieta especial guardada!');
+                } else {
+                    alert('✅ ¡Perfecto! No tienes restricciones dietéticas.');
+                }
                 hideDietForm();
             } else {
                 alert('Por favor, selecciona una opción de dieta');
@@ -386,7 +365,6 @@ bgRef.on('value', (snapshot) => {
 
         function openMaps() {
             window.open('https://maps.app.goo.gl/E7KchiZa2uGNqmCW6?g_st=ac', '_blank');
-       
         }
     </script>
 </body>
