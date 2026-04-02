@@ -11,20 +11,20 @@
             box-sizing: border-box;
         }
 
-       body {
-    font-family: 'Arial', sans-serif;
-    min-height: 100vh;
-    background-image: url('WhatsApp Image 2026-03-31 at 17.25.54.jpeg');  /* ← CAMBIA POR TU FOTO */
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    transition: all 0.5s ease;
-}
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            background-image: url('WhatsApp Image 2026-03-31 at 17.25.54.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.5s ease;
+        }
 
         .container {
             background: rgba(255, 255, 255, 0.95);
@@ -88,6 +88,17 @@
             transform: none;
         }
 
+        /* 🔥 NUEVO: BOTÓN ROJO PARA NO ASISTIR */
+        .btn-no {
+            background: linear-gradient(45deg, #dc3545, #c82333) !important;
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3) !important;
+        }
+
+        .btn-no:hover {
+            box-shadow: 0 15px 30px rgba(220, 53, 69, 0.4) !important;
+            transform: translateY(-3px) !important;
+        }
+
         .form-group {
             margin: 20px 0;
             display: none;
@@ -126,6 +137,13 @@
             border-radius: 10px;
             margin: 20px 0;
             display: none;
+        }
+
+        /* 🔥 NUEVO: ÉXITO PARA NO ASISTIR */
+        .no-attend-success {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border: 1px solid #f5c6cb !important;
         }
 
         .links {
@@ -201,15 +219,18 @@
                 <a href="#" class="link-btn" onclick="showGuestView()">
                     🎉 ENTRAR COMO INVITADO
                 </a>
-              
             </div>
         </div>
 
         <div id="guestView" style="display: none;">
-            <h1>quien viene?</h1>
+            <h1>¿Venis?</h1>
             <p class="subtitle">¡Confirma tu asistencia!</p>
             
+            <!-- ✅ BOTÓN VERDE -->
             <button class="btn" id="confirmBtn">✅ Confirmar Asistencia</button>
+            
+            <!-- 🔥 NUEVO BOTÓN ROJO -->
+            <button class="btn btn-no" id="noAttendBtn" onclick="noAttend()">❌ No podré asistir</button>
             
             <div class="form-group" id="nameForm">
                 <input type="text" id="fullName" placeholder="Escribe tu Nombre Completo" maxlength="50">
@@ -259,22 +280,31 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const guestsRef = db.ref('confirmedGuests');
+        const noGuestsRef = db.ref('noAttendingGuests'); // 🔥 NUEVA REFERENCIA
         const dietsRef = db.ref('specialDiets');
-        
-        // 🔥 FONDO DESDE FIREBASE (NUEVO!)
-        const bgRef = db.ref('backgroundUrl');
-        bgRef.on('value', (snapshot) => {
-            const url = snapshot.val();
-            if (url) {
-                document.body.style.backgroundImage = `url(${url})`;
-                document.body.style.backgroundSize = 'cover';
-                document.body.style.backgroundPosition = 'center';
-                document.body.style.backgroundAttachment = 'fixed';
-            }
-        });
         
         let currentGuest = null;
         let selectedDiet = null;
+
+        // 🔥 NUEVA FUNCIÓN: NO PODRÉ ASISTIR
+        function noAttend() {
+            const name = prompt('😔 ¿Cómo te llamás? (para llevar cuenta)');
+            if (name && name.trim()) {
+                noGuestsRef.once('value').then((snapshot) => {
+                    const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
+                    if (!noGuests.includes(name.trim())) {
+                        noGuestsRef.push(name.trim());
+                        alert(`😢 Gracias por avisar ${name.trim()}! 💕\n\n¡Te vamos a extrañar en la fiesta!`);
+                        document.getElementById('confirmBtn').style.display = 'none';
+                        document.getElementById('noAttendBtn').style.display = 'none';
+                    } else {
+                        alert('😅 Ya habías confirmado que no venís!');
+                    }
+                });
+            } else {
+                alert('Por favor, escribí tu nombre');
+            }
+        }
 
         // Navegación
         function backToWelcome() {
@@ -290,6 +320,7 @@
 
         function resetForms() {
             document.getElementById('confirmBtn').style.display = 'block';
+            document.getElementById('noAttendBtn').style.display = 'block'; // 🔥 RESET
             document.getElementById('nameForm').classList.remove('active');
             document.getElementById('successMsg').style.display = 'none';
             document.getElementById('mainButtons').style.display = 'none';
@@ -302,6 +333,7 @@
 
         document.getElementById('confirmBtn').onclick = function() {
             document.getElementById('confirmBtn').style.display = 'none';
+            document.getElementById('noAttendBtn').style.display = 'none'; // 🔥 OCULTAR ROJO
             document.getElementById('nameForm').classList.add('active');
         };
 
