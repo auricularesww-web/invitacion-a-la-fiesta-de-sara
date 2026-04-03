@@ -1,3 +1,6 @@
+¡Perfecto! Aquí está tu código **mejorado** con un formulario súper lindo para cuando no pueden asistir y que **vuelve al inicio** automáticamente:
+
+```html
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -86,7 +89,7 @@
         transform: none;
     }
 
-    /* 🔥 NUEVO: BOTÓN ROJO PARA NO ASISTIR */
+    /* 🔥 BOTÓN ROJO PARA NO ASISTIR */
     .btn-no {
         background: linear-gradient(45deg, #dc3545, #c82333) !important;
         box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3) !important;
@@ -137,7 +140,6 @@
         display: none;
     }
 
-    /* 🔥 NUEVO: ÉXITO PARA NO ASISTIR */
     .no-attend-success {
         background: #f8d7da !important;
         color: #721c24 !important;
@@ -200,10 +202,116 @@
         border-color: #d63384;
     }
 
+    /* ✨ NUEVO: FORMULARIO LINDO PARA NO ASISTIR */
+    .no-attend-form {
+        background: linear-gradient(135deg, rgba(248, 215, 218, 0.9), rgba(220, 53, 69, 0.1));
+        border: 2px solid rgba(220, 53, 69, 0.3);
+        border-radius: 25px;
+        padding: 35px 25px;
+        margin: 20px 0;
+        backdrop-filter: blur(15px);
+        animation: heartBeat 0.6s ease-out;
+        box-shadow: 0 15px 35px rgba(220, 53, 69, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .no-attend-form::before {
+        content: '💔';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        font-size: 3rem;
+        opacity: 0.3;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes heartBeat {
+        0% { transform: scale(0.95); opacity: 0; }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .no-attend-title {
+        color: #dc3545;
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .no-attend-subtitle {
+        color: #721c24;
+        margin-bottom: 25px;
+        font-size: 1.1em;
+        line-height: 1.4;
+    }
+
+    .no-attend-input {
+        width: 100%;
+        padding: 18px 20px;
+        border: 3px solid rgba(220, 53, 69, 0.3);
+        border-radius: 15px;
+        font-size: 1.2em;
+        background: rgba(255, 255, 255, 0.9);
+        margin-bottom: 20px;
+        transition: all 0.4s ease;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .no-attend-input:focus {
+        outline: none;
+        border-color: #dc3545;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.15), inset 0 2px 5px rgba(0,0,0,0.05);
+        transform: translateY(-2px);
+    }
+
+    .no-attend-input::placeholder {
+        color: #adb5bd;
+        font-style: italic;
+    }
+
+    .btn-back-home {
+        background: linear-gradient(45deg, #6c757d, #495057) !important;
+        box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3) !important;
+        font-size: 1.1em;
+        padding: 18px 30px;
+    }
+
+    .btn-back-home:hover {
+        box-shadow: 0 15px 30px rgba(108, 117, 125, 0.4) !important;
+        transform: translateY(-3px) !important;
+    }
+
+    .saved-message {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+        padding: 20px;
+        border-radius: 20px;
+        margin: 20px 0;
+        border: 2px solid rgba(220, 53, 69, 0.3);
+        display: none;
+        animation: bounceIn 0.6s ease-out;
+        font-size: 1.1em;
+    }
+
+    @keyframes bounceIn {
+        0% { transform: scale(0.3); opacity: 0; }
+        50% { transform: scale(1.05); }
+        70% { transform: scale(0.9); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
     @media (max-width: 480px) {
         .container { padding: 30px 20px; }
         h1 { font-size: 2em; }
         .diet-options { grid-template-columns: 1fr; }
+        .no-attend-form { padding: 25px 20px; }
     }
 </style>
 
@@ -227,8 +335,26 @@
         <!-- ✅ BOTÓN VERDE -->
         <button class="btn" id="confirmBtn">✅ Confirmar Asistencia</button>
         
-        <!-- 🔥 NUEVO BOTÓN ROJO -->
-        <button class="btn btn-no" id="noAttendBtn" onclick="noAttend()">❌ No podré asistir</button>
+        <!-- 🔥 BOTÓN ROJO -->
+        <button class="btn btn-no" id="noAttendBtn" onclick="showNoAttendForm()">❌ No podré asistir</button>
+        
+        <!-- ✨ NUEVO FORMULARIO LINDO -->
+        <div class="form-group" id="noAttendForm">
+            <div class="no-attend-form">
+                <div class="no-attend-title">😢 ¡Qué pena!</div>
+                <p class="no-attend-subtitle">
+                    Te vamos a extrañar muchísimo en la fiesta 💔<br>
+                    <strong>Deja tu nombre para llevar cuenta</strong>
+                </p>
+                <input type="text" class="no-attend-input" id="noAttendName" 
+                       placeholder="Escribe tu nombre completo ✨" maxlength="50">
+                <button class="btn btn-back-home" onclick="saveNoAttend()">💾 Guardar y Volver al inicio</button>
+            </div>
+            <div class="saved-message" id="noAttendSavedMsg">
+                ✅ <span id="savedNoAttendName"></span><br>
+                ¡Gracias por avisar! Te queremos 💕
+            </div>
+        </div>
         
         <div class="form-group" id="nameForm">
             <input type="text" id="fullName" placeholder="Escribe tu Nombre Completo" maxlength="50">
@@ -278,33 +404,57 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const guestsRef = db.ref('confirmedGuests');
-    const noGuestsRef = db.ref('noAttendingGuests'); // 🔥 NUEVA REFERENCIA
+    const noGuestsRef = db.ref('noAttendingGuests');
     const dietsRef = db.ref('specialDiets');
     
     let currentGuest = null;
     let selectedDiet = null;
 
-    // 🔥 NUEVA FUNCIÓN: NO PODRÉ ASISTIR
-    function noAttend() {
-        const name = prompt('😔 ¿Cómo te llamás? (para llevar cuenta)');
-        if (name && name.trim()) {
-            noGuestsRef.once('value').then((snapshot) => {
-                const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
-                if (!noGuests.includes(name.trim())) {
-                    noGuestsRef.push(name.trim());
-                    alert(`😢 Gracias por avisar ${name.trim()}! 💕\n\n¡Te vamos a extrañar en la fiesta!`);
-                    document.getElementById('confirmBtn').style.display = 'none';
-                    document.getElementById('noAttendBtn').style.display = 'none';
-                } else {
-                    alert('😅 Ya habías confirmado que no venís!');
-                }
-            });
-        } else {
-            alert('Por favor, escribí tu nombre');
-        }
+    // ✨ NUEVA FUNCIÓN: MOSTRAR FORMULARIO LINDO
+    function showNoAttendForm() {
+        document.getElementById('confirmBtn').style.display = 'none';
+        document.getElementById('noAttendBtn').style.display = 'none';
+        document.getElementById('noAttendForm').classList.add('active');
+        document.getElementById('noAttendName').focus();
     }
 
-    // Navegación
+    // ✨ GUARDAR NO ASISTE Y VOLVER AL INICIO
+    function saveNoAttend() {
+        const name = document.getElementById('noAttendName').value.trim();
+        
+        if (!name) {
+            alert('🙏 Por favor, escribe tu nombre completo');
+            return;
+        }
+
+        noGuestsRef.once('value').then((snapshot) => {
+            const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
+            if (!noGuests.includes(name)) {
+                noGuestsRef.push(name);
+                document.getElementById('savedNoAttendName').textContent = name;
+                document.getElementById('noAttendSavedMsg').style.display = 'block';
+                
+                // Animación antes de volver
+                setTimeout(() => {
+                    backToWelcome();
+                }, 2000);
+            } else {
+                alert('😅 Ya habías confirmado que no venís!');
+                backToWelcome();
+            }
+        });
+    }
+
+    // Enter para guardar nombre no asistir
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('noAttendName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                saveNoAttend();
+            }
+        });
+    });
+
+    // Resto de funciones SIN CAMBIOS
     function backToWelcome() {
         document.getElementById('welcomeScreen').style.display = 'block';
         document.getElementById('guestView').style.display = 'none';
@@ -316,86 +466,3 @@
         document.getElementById('guestView').style.display = 'block';
     }
 
-    function resetForms() {
-        document.getElementById('confirmBtn').style.display = 'block';
-        document.getElementById('noAttendBtn').style.display = 'block'; // 🔥 RESET
-        document.getElementById('nameForm').classList.remove('active');
-        document.getElementById('successMsg').style.display = 'none';
-        document.getElementById('mainButtons').style.display = 'none';
-        document.getElementById('dietForm').classList.remove('active');
-        document.getElementById('fullName').value = '';
-        selectedDiet = null;
-        document.getElementById('saveDietBtn').disabled = true;
-        document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
-    }
-
-    document.getElementById('confirmBtn').onclick = function() {
-        document.getElementById('confirmBtn').style.display = 'none';
-        document.getElementById('noAttendBtn').style.display = 'none'; // 🔥 OCULTAR ROJO
-        document.getElementById('nameForm').classList.add('active');
-    };
-
-    function selectDiet(diet) {
-        selectedDiet = diet;
-        document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
-        event.target.classList.add('selected');
-        document.getElementById('saveDietBtn').disabled = false;
-    }
-
-    function showDietForm() {
-        document.getElementById('dietForm').classList.add('active');
-    }
-
-    function hideDietForm() {
-        document.getElementById('dietForm').classList.remove('active');
-        resetDietSelection();
-    }
-
-    function resetDietSelection() {
-        selectedDiet = null;
-        document.getElementById('saveDietBtn').disabled = true;
-        document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
-    }
-
-    function saveGuest() {
-        const name = document.getElementById('fullName').value.trim();
-        if (name) {
-            guestsRef.once('value').then((snapshot) => {
-                const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
-                if (!guests.includes(name)) {
-                    guestsRef.push(name);
-                    currentGuest = name;
-                    document.getElementById('savedName').textContent = name;
-                    document.getElementById('successMsg').style.display = 'block';
-                    document.getElementById('nameForm').classList.remove('active');
-                    document.getElementById('mainButtons').style.display = 'block';
-                } else {
-                    alert('✅ ¡Ya estás confirmado!');
-                }
-            });
-        } else {
-            alert('Por favor, escribe tu nombre completo');
-        }
-    }
-
-    function saveDiet() {
-        if (selectedDiet && currentGuest) {
-            if (selectedDiet !== 'Ninguna') {
-                dietsRef.push(`${currentGuest}: ${selectedDiet}`);
-                alert('✅ ¡Dieta especial guardada!');
-            } else {
-                alert('✅ ¡Perfecto! No tienes restricciones dietéticas.');
-            }
-            hideDietForm();
-        } else {
-            alert('Por favor, selecciona una opción de dieta');
-        }
-    }
-
-    function openMaps() {
-        window.open('https://maps.app.goo.gl/E7KchiZa2uGNqmCW6?g_st=ac', '_blank');
-    }
-</script>
-
-</body>
-</html>
