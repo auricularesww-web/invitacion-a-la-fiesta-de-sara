@@ -236,7 +236,7 @@
         </div>
 
         <div class="success" id="successMsg">
-            ✅ ¡Tu asistencia ha sido confirmada! 
+            ✅ ¡Tu asistencia ha sido confirmada! Dress Code: Elegante sport 
             <br><strong id="savedName"></strong>
         </div>
 
@@ -286,7 +286,7 @@
 
     // 🔥 NUEVA FUNCIÓN: NO PODRÉ ASISTIR
     function noAttend() {
-        const name = prompt('😔 ¿Cómo te llamás? (para llevar cuenta)');
+        const name = prompt('😔 ¿Cómo te llamás?');
         if (name && name.trim()) {
             noGuestsRef.once('value').then((snapshot) => {
                 const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
