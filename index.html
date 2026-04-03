@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -10,429 +9,393 @@
             padding: 0;
             box-sizing: border-box;
         }
+    body {
+        font-family: 'Arial', sans-serif;
+        min-height: 100vh;
+        background-image: url('WhatsApp Image 2026-03-31 at 17.25.54.jpeg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        transition: all 0.5s ease;
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            min-height: 100vh;
-            background-image: url('WhatsApp Image 2026-03-31 at 17.25.54.jpeg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            transition: all 0.5s ease;
-        }
+    .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 40px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        animation: slideIn 0.8s ease-out;
+    }
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            animation: slideIn 0.8s ease-out;
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
         }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    h1 {
+        color: #d63384;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
 
-        h1 {
-            color: #d63384;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
+    .subtitle {
+        color: #6c757d;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+    }
 
-        .subtitle {
-            color: #6c757d;
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
+    .btn {
+        background: linear-gradient(45deg, #d63384, #e91e63);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1em;
+        border-radius: 50px;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(214, 51, 132, 0.3);
+        width: 280px;
+        max-width: 90%;
+    }
 
-        .btn {
-            background: linear-gradient(45deg, #d63384, #e91e63);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1em;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(214, 51, 132, 0.3);
-            width: 280px;
-            max-width: 90%;
-        }
+    .btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(214, 51, 132, 0.4);
+    }
 
-        .btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(214, 51, 132, 0.4);
-        }
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
+    /* 🔥 NUEVO: BOTÓN ROJO PARA NO ASISTIR */
+    .btn-no {
+        background: linear-gradient(45deg, #dc3545, #c82333) !important;
+        box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3) !important;
+    }
 
-        /* 🔥 BOTÓN ROJO PARA NO ASISTIR */
-        .btn-no {
-            background: linear-gradient(45deg, #dc3545, #c82333) !important;
-            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3) !important;
-        }
+    .btn-no:hover {
+        box-shadow: 0 15px 30px rgba(220, 53, 69, 0.4) !important;
+        transform: translateY(-3px) !important;
+    }
 
-        .btn-no:hover {
-            box-shadow: 0 15px 30px rgba(220, 53, 69, 0.4) !important;
-            transform: translateY(-3px) !important;
-        }
+    .form-group {
+        margin: 20px 0;
+        display: none;
+    }
 
-        /* 🔥 BOTÓN ROJO PARA FORMULARIO NO ASISTIR */
-        .btn-no-form {
-            background: linear-gradient(45deg, #dc3545, #c82333) !important;
-        }
+    .form-group.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
 
-        .form-group {
-            margin: 20px 0;
-            display: none;
-        }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        .form-group.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
+    input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1.1em;
+        margin: 10px 0;
+        transition: border-color 0.3s ease;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    input:focus {
+        outline: none;
+        border-color: #d63384;
+        box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.1);
+    }
 
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 1.1em;
-            margin: 10px 0;
-            transition: border-color 0.3s ease;
-        }
+    .success {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 20px 0;
+        display: none;
+    }
 
-        input:focus {
-            outline: none;
-            border-color: #d63384;
-            box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.1);
-        }
+    /* 🔥 NUEVO: ÉXITO PARA NO ASISTIR */
+    .no-attend-success {
+        background: #f8d7da !important;
+        color: #721c24 !important;
+        border: 1px solid #f5c6cb !important;
+    }
 
-        .success {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            display: none;
-        }
+    .links {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
 
-        /* 🔥 ÉXITO ROJO PARA NO ASISTIR */
-        .no-attend-success {
-            background: #f8d7da !important;
-            color: #721c24 !important;
-            border: 1px solid #f5c6cb !important;
-        }
+    .link-btn {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        padding: 15px;
+        text-decoration: none;
+        color: white;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-size: 1.1em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
 
-        .links {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    .link-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,123,255,0.3);
+    }
 
-        .link-btn {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            padding: 15px;
-            text-decoration: none;
-            color: white;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            font-size: 1.1em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+    .diet-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 20px 0;
+    }
 
-        .link-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,123,255,0.3);
-        }
+    .diet-option {
+        padding: 15px;
+        border: 3px solid #e9ecef;
+        border-radius: 15px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1em;
+        text-align: center;
+    }
 
-        .diet-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 20px 0;
-        }
+    .diet-option:hover {
+        border-color: #d63384;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(214, 51, 132, 0.2);
+    }
 
-        .diet-option {
-            padding: 15px;
-            border: 3px solid #e9ecef;
-            border-radius: 15px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1em;
-            text-align: center;
-        }
+    .diet-option.selected {
+        background: linear-gradient(45deg, #d63384, #e91e63);
+        color: white;
+        border-color: #d63384;
+    }
 
-        .diet-option:hover {
-            border-color: #d63384;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(214, 51, 132, 0.2);
-        }
+    @media (max-width: 480px) {
+        .container { padding: 30px 20px; }
+        h1 { font-size: 2em; }
+        .diet-options { grid-template-columns: 1fr; }
+    }
+</style>
 
-        .diet-option.selected {
-            background: linear-gradient(45deg, #d63384, #e91e63);
-            color: white;
-            border-color: #d63384;
-        }
-
-        @media (max-width: 480px) {
-            .container { padding: 30px 20px; }
-            h1 { font-size: 2em; }
-            .diet-options { grid-template-columns: 1fr; }
-        }
-    </style>
 </head>
 <body>
     <div class="container" id="mainContainer">
         <div id="welcomeScreen">
             <h1>🎂 ¡Te invito a mis 15 Sara!</h1>
             <p class="subtitle">¡Confirma tu asistencia a la fiesta más increíble el dia 8 de julio de 21 a 5am!</p>
-            
-            <div class="links">
-                <a href="#" class="link-btn" onclick="showGuestView()">
-                    🎉 ENTRAR COMO INVITADO
-                </a>
-            </div>
-        </div>
-
-        <div id="guestView" style="display: none;">
-            <h1>¿Venís a la fiesta?</h1>
-            <p class="subtitle">¡Confirma tu asistencia!</p>
-            
-            <!-- ✅ BOTÓN VERDE - SÍ -->
-            <button class="btn" id="confirmBtn">✅ Confirmar Asistencia</button>
-            
-            <!-- 🔥 BOTÓN ROJO - NO (ahora muestra formulario) -->
-            <button class="btn btn-no" id="noAttendBtn" onclick="showNoAttendForm()">❌ No podré asistir</button>
-            
-            <!-- 🔥 FORMULARIO VERDE (SÍ) -->
-            <div class="form-group" id="nameForm">
-                <h3 style="color: #28a745; margin-bottom: 20px;">🎉 ¡Genial que vengas!</h3>
-                <input type="text" id="fullName" placeholder="Escribe tu Nombre Completo" maxlength="50">
-                <button class="btn" onclick="saveGuest()">✅ Guardar y Continuar</button>
-            </div>
-
-            <!-- 🔥 FORMULARIO ROJO (NO) - NUEVO -->
-            <div class="form-group" id="noAttendForm">
-                <h3 style="color: #dc3545; margin-bottom: 20px;">😢 ¡Te vamos a extrañar!</h3>
-                <input type="text" id="noAttendName" placeholder="Escribe tu Nombre Completo" maxlength="50">
-                <button class="btn btn-no-form" onclick="saveNoAttend()">💔 Guardar y Salir</button>
-            </div>
-
-            <!-- Mensaje éxito VERDE -->
-            <div class="success" id="successMsg">
-                ✅ ¡Tu asistencia ha sido confirmada! 
-                <br><strong id="savedName"></strong>
-            </div>
-
-            <!-- Mensaje éxito ROJO - NUEVO -->
-            <div class="success no-attend-success" id="noAttendSuccess">
-                😢 ¡Gracias por avisar! 
-                <br><strong id="savedNoAttendName"></strong>
-                <br>¡Te vamos a extrañar! 💕
-            </div>
-
-            <div id="mainButtons" style="display: none;">
-                <button class="btn" onclick="showDietForm()">🥗 Dieta Especial</button>
-                <button class="btn" onclick="openMaps()">📍 Ver Ubicación</button>
-                <button class="btn" onclick="backToWelcome()" style="background: #6c757d;">← Volver</button>
-            </div>
-
-            <div class="form-group" id="dietForm">
-                <p>¿Cuál es tu dieta especial?</p>
-                <div class="diet-options">
-                    <div class="diet-option" onclick="selectDiet('Celiaca')" data-diet="Celiaca">🌾 Celiaca</div>
-                    <div class="diet-option" onclick="selectDiet('Vegetariana')" data-diet="Vegetariana">🥬 Vegetariana</div>
-                    <div class="diet-option" onclick="selectDiet('Ninguna')" data-diet="Ninguna">✅ Ninguna</div>
-                </div>
-                <button class="btn" id="saveDietBtn" onclick="saveDiet()" disabled>Guardar Dieta</button>
-                <button class="btn" onclick="hideDietForm()" style="background: #6c757d;">Cancelar</button>
-            </div>
+        <div class="links">
+            <a href="#" class="link-btn" onclick="showGuestView()">
+                🎉 ENTRAR COMO INVITADO
+            </a>
         </div>
     </div>
 
-    <!-- 🔥 FIREBASE SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-    <script>
-        // 🔥 CONFIGURACIÓN FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
-            authDomain: "cumple-de-sara.firebaseapp.com",
-            databaseURL: "https://cumple-de-sara-default-rtdb.firebaseio.com",
-            projectId: "cumple-de-sara",
-            storageBucket: "cumple-de-sara.firebasestorage.app",
-            messagingSenderId: "552258745730",
-            appId: "1:552258745730:web:e9fe5ec73e1dbf7bcb4b9b"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const guestsRef = db.ref('confirmedGuests');
-        const noGuestsRef = db.ref('noAttendingGuests');
-        const dietsRef = db.ref('specialDiets');
+    <div id="guestView" style="display: none;">
+        <h1>¿Venis?</h1>
+        <p class="subtitle">¡Confirma tu asistencia!</p>
         
-        let currentGuest = null;
-        let selectedDiet = null;
-        let isNoAttendMode = false; // 🔥 NUEVA VARIABLE
+        <!-- ✅ BOTÓN VERDE -->
+        <button class="btn" id="confirmBtn">✅ Confirmar Asistencia</button>
+        
+        <!-- 🔥 NUEVO BOTÓN ROJO -->
+        <button class="btn btn-no" id="noAttendBtn" onclick="noAttend()">❌ No podré asistir</button>
+        
+        <div class="form-group" id="nameForm">
+            <input type="text" id="fullName" placeholder="Escribe tu Nombre Completo" maxlength="50">
+            <button class="btn" onclick="saveGuest()">Guardar y Continuar</button>
+        </div>
 
-        // 🔥 MOSTRAR FORMULARIO ROJO (NO ASISTIR)
-        function showNoAttendForm() {
-            document.getElementById('confirmBtn').style.display = 'none';
-            document.getElementById('noAttendBtn').style.display = 'none';
-            document.getElementById('nameForm').classList.remove('active');
-            document.getElementById('noAttendForm').classList.add('active');
-            isNoAttendMode = true;
-        }
+        <div class="success" id="successMsg">
+            ✅ ¡Tu asistencia ha sido confirmada! 
+            <br><strong id="savedName"></strong>
+        </div>
 
-        // 🔥 GUARDAR NO ASISTENTE Y CERRAR PÁGINA
-        function saveNoAttend() {
-            const name = document.getElementById('noAttendName').value.trim();
-            if (name) {
-                noGuestsRef.once('value').then((snapshot) => {
-                    const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
-                    if (!noGuests.includes(name)) {
-                        noGuestsRef.push(name);
-                        document.getElementById('savedNoAttendName').textContent = name;
-                        document.getElementById('noAttendSuccess').style.display = 'block';
-                        document.getElementById('noAttendForm').classList.remove('active');
-                        
-                        // 🔥 CERRAR PÁGINA DESPUÉS DE 2 SEGUNDOS
-                        setTimeout(() => {
-                            window.close();
-                            // Si no se puede cerrar, redirigir a página de gracias
-                            if (!window.closed) {
-                                window.location.href = 'data:text/html,<!DOCTYPE html><html><head><title>Gracias</title></head><body style="background:#f8d7da;padding:50px;text-align:center;font-family:Arial;"><h1>😢 Gracias por avisar!</h1><p>¡Te vamos a extrañar <strong>' + name + '</strong>! 💕</p><script>setTimeout(() => {window.close();}, 3000);</script></body></html>';
-                            }
-                        }, 2000);
-                    } else {
-                        alert('😅 Ya habías confirmado que no venís!');
-                    }
-                });
-            } else {
-                alert('Por favor, escribe tu nombre completo');
-            }
-        }
+        <div id="mainButtons" style="display: none;">
+            <button class="btn" onclick="showDietForm()">🥗 Dieta Especial</button>
+            <button class="btn" onclick="openMaps()">📍 Ver Ubicación</button>
+            <button class="btn" onclick="backToWelcome()" style="background: #6c757d;">← Volver</button>
+        </div>
 
-        // Navegación
-        function backToWelcome() {
-            document.getElementById('welcomeScreen').style.display = 'block';
-            document.getElementById('guestView').style.display = 'none';
-            resetForms();
-        }
+        <div class="form-group" id="dietForm">
+            <p>¿Cuál es tu dieta especial?</p>
+            <div class="diet-options">
+                <div class="diet-option" onclick="selectDiet('Celiaca')" data-diet="Celiaca">🌾 Celiaca</div>
+                <div class="diet-option" onclick="selectDiet('Vegetariana')" data-diet="Vegetariana">🥬 Vegetariana</div>
+                <div class="diet-option" onclick="selectDiet('Ninguna')" data-diet="Ninguna">✅ Ninguna</div>
+            </div>
+            <button class="btn" id="saveDietBtn" onclick="saveDiet()" disabled>Guardar Dieta</button>
+            <button class="btn" onclick="hideDietForm()" style="background: #6c757d;">Cancelar</button>
+        </div>
+    </div>
+</div>
 
-        function showGuestView() {
-            document.getElementById('welcomeScreen').style.display = 'none';
-            document.getElementById('guestView').style.display = 'block';
-        }
+<!-- 🔥 FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-        function resetForms() {
-            document.getElementById('confirmBtn').style.display = 'block';
-            document.getElementById('noAttendBtn').style.display = 'block';
-            document.getElementById('nameForm').classList.remove('active');
-            document.getElementById('noAttendForm').classList.remove('active'); // 🔥 NUEVO
-            document.getElementById('successMsg').style.display = 'none';
-            document.getElementById('noAttendSuccess').style.display = 'none'; // 🔥 NUEVO
-            document.getElementById('mainButtons').style.display = 'none';
-            document.getElementById('dietForm').classList.remove('active');
-            document.getElementById('fullName').value = '';
-            document.getElementById('noAttendName').value = ''; // 🔥 NUEVO
-            selectedDiet = null;
-            isNoAttendMode = false; // 🔥 RESET
-            document.getElementById('saveDietBtn').disabled = true;
-            document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
-        }
+<script>
+    // 🔥 CONFIGURACIÓN FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
+        authDomain: "cumple-de-sara.firebaseapp.com",
+        databaseURL: "https://cumple-de-sara-default-rtdb.firebaseio.com",
+        projectId: "cumple-de-sara",
+        storageBucket: "cumple-de-sara.firebasestorage.app",
+        messagingSenderId: "552258745730",
+        appId: "1:552258745730:web:e9fe5ec73e1dbf7bcb4b9b"
+    };
 
-        // ✅ BOTÓN VERDE (SÍ) - Sin cambios
-        document.getElementById('confirmBtn').onclick = function() {
-            document.getElementById('confirmBtn').style.display = 'none';
-            document.getElementById('noAttendBtn').style.display = 'none';
-            document.getElementById('noAttendForm').classList.remove('active');
-            document.getElementById('nameForm').classList.add('active');
-            isNoAttendMode = false;
-        };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const guestsRef = db.ref('confirmedGuests');
+    const noGuestsRef = db.ref('noAttendingGuests'); // 🔥 NUEVA REFERENCIA
+    const dietsRef = db.ref('specialDiets');
+    
+    let currentGuest = null;
+    let selectedDiet = null;
 
-        function selectDiet(diet) {
-            selectedDiet = diet;
-            document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
-            event.target.classList.add('selected');
-            document.getElementById('saveDietBtn').disabled = false;
-        }
-
-        function showDietForm() {
-            document.getElementById('dietForm').classList.add('active');
-        }
-
-        function hideDietForm() {
-            document.getElementById('dietForm').classList.remove('active');
-            resetDietSelection();
-        }
-
-        function resetDietSelection() {
-            selectedDiet = null;
-            document.getElementById('saveDietBtn').disabled = true;
-            document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
-        }
-
-        function saveGuest() {
-            const name = document.getElementById('fullName').value.trim();
-            if (name) {
-                guestsRef.once('value').then((snapshot) => {
-                    const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
-                    if (!guests.includes(name)) {
-                        guestsRef.push(name);
-                        currentGuest = name;
-                        document.getElementById('savedName').textContent = name;
-                        document.getElementById('successMsg').style.display = 'block';
-                        document.getElementById('nameForm').classList.remove('active');
-                        document.getElementById('mainButtons').style.display = 'block';
-                    } else {
-                        alert('✅ ¡Ya estás confirmado!');
-                    }
-                });
-            } else {
-                alert('Por favor, escribe tu nombre completo');
-            }
-        }
-
-        function saveDiet() {
-            if (selectedDiet && currentGuest) {
-                if (selectedDiet !== 'Ninguna') {
-                    dietsRef.push(`${currentGuest}: ${selectedDiet}`);
-                    alert('✅ ¡Dieta especial guardada!');
+    // 🔥 NUEVA FUNCIÓN: NO PODRÉ ASISTIR
+    function noAttend() {
+        const name = prompt('😔 ¿Cómo te llamás? (para llevar cuenta)');
+        if (name && name.trim()) {
+            noGuestsRef.once('value').then((snapshot) => {
+                const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
+                if (!noGuests.includes(name.trim())) {
+                    noGuestsRef.push(name.trim());
+                    alert(`😢 Gracias por avisar ${name.trim()}! 💕\n\n¡Te vamos a extrañar en la fiesta!`);
+                    document.getElementById('confirmBtn').style.display = 'none';
+                    document.getElementById('noAttendBtn').style.display = 'none';
                 } else {
-                    alert('✅ ¡Perfecto! No tienes restricciones dietéticas.');
+                    alert('😅 Ya habías confirmado que no venís!');
                 }
+            });
+        } else {
+            alert('Por favor, escribí tu nombre');
+        }
+    }
+
+    // Navegación
+    function backToWelcome() {
+        document.getElementById('welcomeScreen').style.display = 'block';
+        document.getElementById('guestView').style.display = 'none';
+        resetForms();
+    }
+
+    function showGuestView() {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('guestView').style.display = 'block';
+    }
+
+    function resetForms() {
+        document.getElementById('confirmBtn').style.display = 'block';
+        document.getElementById('noAttendBtn').style.display = 'block'; // 🔥 RESET
+        document.getElementById('nameForm').classList.remove('active');
+        document.getElementById('successMsg').style.display = 'none';
+        document.getElementById('mainButtons').style.display = 'none';
+        document.getElementById('dietForm').classList.remove('active');
+        document.getElementById('fullName').value = '';
+        selectedDiet = null;
+        document.getElementById('saveDietBtn').disabled = true;
+        document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
+    }
+
+    document.getElementById('confirmBtn').onclick = function() {
+        document.getElementById('confirmBtn').style.display = 'none';
+        document.getElementById('noAttendBtn').style.display = 'none'; // 🔥 OCULTAR ROJO
+        document.getElementById('nameForm').classList.add('active');
+    };
+
+    function selectDiet(diet) {
+        selectedDiet = diet;
+        document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
+        event.target.classList.add('selected');
+        document.getElementById('saveDietBtn').disabled = false;
+    }
+
+    function showDietForm() {
+        document.getElementById('dietForm').classList.add('active');
+    }
+
+    function hideDietForm() {
+        document.getElementById('dietForm').classList.remove('active');
+        resetDietSelection();
+    }
+
+    function resetDietSelection() {
+        selectedDiet = null;
+        document.getElementById('saveDietBtn').disabled = true;
+        document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
+    }
+
+    function saveGuest() {
+        const name = document.getElementById('fullName').value.trim();
+        if (name) {
+            guestsRef.once('value').then((snapshot) => {
+                const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
+                if (!guests.includes(name)) {
+                    guestsRef.push(name);
+                    currentGuest = name;
+                    document.getElementById('savedName').textContent = name;
+                    document.getElementById('successMsg').style.display = 'block';
+                    document.getElementById('nameForm').classList.remove('active');
+                    document.getElementById('mainButtons').style.display = 'block';
+                } else {
+                    alert('✅ ¡Ya estás confirmado!');
+                }
+            });
+        } else {
+            alert('Por favor, escribe tu nombre completo');
+        }
+    }
+
+    function saveDiet() {
+        if (selectedDiet && currentGuest) {
+            if (selectedDiet !== 'Ninguna') {
+                dietsRef.push(`${currentGuest}: ${selectedDiet}`);
+                alert('✅ ¡Dieta especial guardada!');
+            } else {
+                alert('✅ ¡Perfecto! No tienes restricciones dietéticas.');
+            }
+            hideDietForm();
+        } else {
+            alert('Por favor, selecciona una opción de dieta');
+        }
+    }
+
+    function openMaps() {
+        window.open('https://maps.app.goo.gl/E7KchiZa2uGNqmCW6?g_st=ac', '_blank');
+    }
+</script>
+
+</body>
+</html>
