@@ -88,7 +88,7 @@
             transform: none;
         }
 
-        /* 🔥 NUEVO: BOTÓN ROJO PARA NO ASISTIR */
+        /* 🔥 BOTÓN ROJO PARA NO ASISTIR */
         .btn-no {
             background: linear-gradient(45deg, #dc3545, #c82333) !important;
             box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3) !important;
@@ -97,6 +97,11 @@
         .btn-no:hover {
             box-shadow: 0 15px 30px rgba(220, 53, 69, 0.4) !important;
             transform: translateY(-3px) !important;
+        }
+
+        /* 🔥 BOTÓN ROJO PARA FORMULARIO NO ASISTIR */
+        .btn-no-form {
+            background: linear-gradient(45deg, #dc3545, #c82333) !important;
         }
 
         .form-group {
@@ -139,7 +144,7 @@
             display: none;
         }
 
-        /* 🔥 NUEVO: ÉXITO PARA NO ASISTIR */
+        /* 🔥 ÉXITO ROJO PARA NO ASISTIR */
         .no-attend-success {
             background: #f8d7da !important;
             color: #721c24 !important;
@@ -223,23 +228,40 @@
         </div>
 
         <div id="guestView" style="display: none;">
-            <h1>¿Venis?</h1>
+            <h1>¿Venís a la fiesta?</h1>
             <p class="subtitle">¡Confirma tu asistencia!</p>
             
-            <!-- ✅ BOTÓN VERDE -->
+            <!-- ✅ BOTÓN VERDE - SÍ -->
             <button class="btn" id="confirmBtn">✅ Confirmar Asistencia</button>
             
-            <!-- 🔥 NUEVO BOTÓN ROJO -->
-            <button class="btn btn-no" id="noAttendBtn" onclick="noAttend()">❌ No podré asistir</button>
+            <!-- 🔥 BOTÓN ROJO - NO (ahora muestra formulario) -->
+            <button class="btn btn-no" id="noAttendBtn" onclick="showNoAttendForm()">❌ No podré asistir</button>
             
+            <!-- 🔥 FORMULARIO VERDE (SÍ) -->
             <div class="form-group" id="nameForm">
+                <h3 style="color: #28a745; margin-bottom: 20px;">🎉 ¡Genial que vengas!</h3>
                 <input type="text" id="fullName" placeholder="Escribe tu Nombre Completo" maxlength="50">
-                <button class="btn" onclick="saveGuest()">Guardar y Continuar</button>
+                <button class="btn" onclick="saveGuest()">✅ Guardar y Continuar</button>
             </div>
 
+            <!-- 🔥 FORMULARIO ROJO (NO) - NUEVO -->
+            <div class="form-group" id="noAttendForm">
+                <h3 style="color: #dc3545; margin-bottom: 20px;">😢 ¡Te vamos a extrañar!</h3>
+                <input type="text" id="noAttendName" placeholder="Escribe tu Nombre Completo" maxlength="50">
+                <button class="btn btn-no-form" onclick="saveNoAttend()">💔 Guardar y Salir</button>
+            </div>
+
+            <!-- Mensaje éxito VERDE -->
             <div class="success" id="successMsg">
                 ✅ ¡Tu asistencia ha sido confirmada! 
                 <br><strong id="savedName"></strong>
+            </div>
+
+            <!-- Mensaje éxito ROJO - NUEVO -->
+            <div class="success no-attend-success" id="noAttendSuccess">
+                😢 ¡Gracias por avisar! 
+                <br><strong id="savedNoAttendName"></strong>
+                <br>¡Te vamos a extrañar! 💕
             </div>
 
             <div id="mainButtons" style="display: none;">
@@ -280,29 +302,48 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const guestsRef = db.ref('confirmedGuests');
-        const noGuestsRef = db.ref('noAttendingGuests'); // 🔥 NUEVA REFERENCIA
+        const noGuestsRef = db.ref('noAttendingGuests');
         const dietsRef = db.ref('specialDiets');
         
         let currentGuest = null;
         let selectedDiet = null;
+        let isNoAttendMode = false; // 🔥 NUEVA VARIABLE
 
-        // 🔥 NUEVA FUNCIÓN: NO PODRÉ ASISTIR
-        function noAttend() {
-            const name = prompt('😔 ¿Cómo te llamás? (para llevar cuenta)');
-            if (name && name.trim()) {
+        // 🔥 MOSTRAR FORMULARIO ROJO (NO ASISTIR)
+        function showNoAttendForm() {
+            document.getElementById('confirmBtn').style.display = 'none';
+            document.getElementById('noAttendBtn').style.display = 'none';
+            document.getElementById('nameForm').classList.remove('active');
+            document.getElementById('noAttendForm').classList.add('active');
+            isNoAttendMode = true;
+        }
+
+        // 🔥 GUARDAR NO ASISTENTE Y CERRAR PÁGINA
+        function saveNoAttend() {
+            const name = document.getElementById('noAttendName').value.trim();
+            if (name) {
                 noGuestsRef.once('value').then((snapshot) => {
                     const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
-                    if (!noGuests.includes(name.trim())) {
-                        noGuestsRef.push(name.trim());
-                        alert(`😢 Gracias por avisar ${name.trim()}! 💕\n\n¡Te vamos a extrañar en la fiesta!`);
-                        document.getElementById('confirmBtn').style.display = 'none';
-                        document.getElementById('noAttendBtn').style.display = 'none';
+                    if (!noGuests.includes(name)) {
+                        noGuestsRef.push(name);
+                        document.getElementById('savedNoAttendName').textContent = name;
+                        document.getElementById('noAttendSuccess').style.display = 'block';
+                        document.getElementById('noAttendForm').classList.remove('active');
+                        
+                        // 🔥 CERRAR PÁGINA DESPUÉS DE 2 SEGUNDOS
+                        setTimeout(() => {
+                            window.close();
+                            // Si no se puede cerrar, redirigir a página de gracias
+                            if (!window.closed) {
+                                window.location.href = 'data:text/html,<!DOCTYPE html><html><head><title>Gracias</title></head><body style="background:#f8d7da;padding:50px;text-align:center;font-family:Arial;"><h1>😢 Gracias por avisar!</h1><p>¡Te vamos a extrañar <strong>' + name + '</strong>! 💕</p><script>setTimeout(() => {window.close();}, 3000);</script></body></html>';
+                            }
+                        }, 2000);
                     } else {
                         alert('😅 Ya habías confirmado que no venís!');
                     }
                 });
             } else {
-                alert('Por favor, escribí tu nombre');
+                alert('Por favor, escribe tu nombre completo');
             }
         }
 
@@ -320,21 +361,28 @@
 
         function resetForms() {
             document.getElementById('confirmBtn').style.display = 'block';
-            document.getElementById('noAttendBtn').style.display = 'block'; // 🔥 RESET
+            document.getElementById('noAttendBtn').style.display = 'block';
             document.getElementById('nameForm').classList.remove('active');
+            document.getElementById('noAttendForm').classList.remove('active'); // 🔥 NUEVO
             document.getElementById('successMsg').style.display = 'none';
+            document.getElementById('noAttendSuccess').style.display = 'none'; // 🔥 NUEVO
             document.getElementById('mainButtons').style.display = 'none';
             document.getElementById('dietForm').classList.remove('active');
             document.getElementById('fullName').value = '';
+            document.getElementById('noAttendName').value = ''; // 🔥 NUEVO
             selectedDiet = null;
+            isNoAttendMode = false; // 🔥 RESET
             document.getElementById('saveDietBtn').disabled = true;
             document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
         }
 
+        // ✅ BOTÓN VERDE (SÍ) - Sin cambios
         document.getElementById('confirmBtn').onclick = function() {
             document.getElementById('confirmBtn').style.display = 'none';
-            document.getElementById('noAttendBtn').style.display = 'none'; // 🔥 OCULTAR ROJO
+            document.getElementById('noAttendBtn').style.display = 'none';
+            document.getElementById('noAttendForm').classList.remove('active');
             document.getElementById('nameForm').classList.add('active');
+            isNoAttendMode = false;
         };
 
         function selectDiet(diet) {
@@ -388,15 +436,3 @@
                 } else {
                     alert('✅ ¡Perfecto! No tienes restricciones dietéticas.');
                 }
-                hideDietForm();
-            } else {
-                alert('Por favor, selecciona una opción de dieta');
-            }
-        }
-
-        function openMaps() {
-            window.open('https://maps.app.goo.gl/E7KchiZa2uGNqmCW6?g_st=ac', '_blank');
-        }
-    </script>
-</body>
-</html>
