@@ -75,6 +75,15 @@
             font-size: 1.3em;
         }
 
+        /* 🎵 NUEVO: Estilo especial para canciones */
+        .admin-list.music-list h3 {
+            color: #28a745;
+            background: linear-gradient(45deg, #d4edda, #c3e6cb);
+            padding: 10px;
+            border-radius: 10px;
+            margin: -20px -20px 15px -20px;
+        }
+
         .guest-item {
             padding: 12px;
             margin: 8px 0;
@@ -84,12 +93,37 @@
             font-size: 1.1em;
         }
 
-        /* 🔥 NUEVO: Estilo para NO asistentes (ROJO) */
+        /* 🔥 Estilo para NO asistentes (ROJO) */
         .guest-item.no-attend {
             background: linear-gradient(135deg, #f8d7da, #f5c6cb);
             border-left: 4px solid #dc3545;
             color: #721c24;
             font-weight: 500;
+        }
+
+        /* 🎵 Estilo para canciones */
+        .guest-item.song-item {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-left: 4px solid #28a745;
+            color: #155724;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .song-name {
+            flex: 1;
+        }
+
+        .song-count {
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            min-width: 25px;
         }
 
         .btn {
@@ -128,7 +162,7 @@
             font-size: 1.2em;
         }
 
-        /* 🔥 NUEVO: Stats para no asistentes */
+        /* 🔥 Stats para no asistentes */
         .stats {
             margin-top: 15px;
             padding: 12px;
@@ -137,6 +171,17 @@
             font-weight: bold;
             color: #dc3545;
             border-left: 4px solid #dc3545;
+        }
+
+        /* 🎵 Stats para canciones */
+        .music-stats {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(40, 167, 69, 0.1);
+            border-radius: 10px;
+            font-weight: bold;
+            color: #28a745;
+            border-left: 4px solid #28a745;
         }
 
         .password-form {
@@ -216,7 +261,7 @@
                 <div class="success" id="photoSuccess">✅ ¡Foto de fondo actualizada!</div>
             </div>
 
-            <!-- 🔥 NUEVA LISTA: NO ASISTENTES -->
+            <!-- 🔥 LISTA: NO ASISTENTES -->
             <div class="admin-list">
                 <h3>😢 No asisten (<span id="totalNoAttending">0</span>)</h3>
                 <div id="noAttendingList">Cargando...</div>
@@ -235,6 +280,15 @@
             <div class="admin-list">
                 <h3>🥗 Dietas Especiales (<span id="totalDiets">0</span>)</h3>
                 <div id="dietList">Cargando...</div>
+            </div>
+
+            <!-- 🎵 NUEVA LISTA: CANCIONES PARA LA FIESTA -->
+            <div class="admin-list music-list">
+                <h3>🎵 Canciones para la Fiesta (<span id="totalSongs">0</span>)</h3>
+                <div id="songsList">Cargando...</div>
+                <div class="music-stats">
+                    <span id="songsCount">0</span> canciones pedidas 🎉 ¡Momento épico asegurado!
+                </div>
             </div>
 
             <!-- Botones de acción -->
@@ -264,17 +318,19 @@
         const db = firebase.database();
         const storage = firebase.storage();
 
-        // 🔥 REFERENCIAS (AGREGADA la de no asistentes)
+        // 🔥 REFERENCIAS (AGREGADA songsRef)
         const guestsRef = db.ref('confirmedGuests');
-        const noGuestsRef = db.ref('noAttendingGuests');  // 🔥 NUEVA
+        const noGuestsRef = db.ref('noAttendingGuests');
         const dietsRef = db.ref('specialDiets');
+        const songsRef = db.ref('partySongs'); // 🎵 NUEVA
         const bgRef = db.ref('backgroundUrl');
         const ADMIN_PASSWORD = "Sara2026";
 
         // SINCRONIZACIÓN EN TIEMPO REAL
         guestsRef.on('value', updateAdminLists);
-        noGuestsRef.on('value', updateAdminLists);  // 🔥 NUEVA
+        noGuestsRef.on('value', updateAdminLists);
         dietsRef.on('value', updateAdminLists);
+        songsRef.on('value', updateAdminLists); // 🎵 NUEVA
         bgRef.on('value', (snapshot) => {
             const url = snapshot.val();
             if (url) {
@@ -331,7 +387,7 @@
             }
         });
 
-        // 🔥 FUNCIÓN ACTUALIZADA: Incluye NO asistentes
+        // 🔥 FUNCIÓN ACTUALIZADA: Incluye CANCIONES
         function updateAdminLists() {
             // Confirmados
             guestsRef.once('value').then((snapshot) => {
@@ -342,7 +398,7 @@
                     : '<div class="guest-item">👤 No hay confirmaciones aún</div>';
             });
 
-            // 🔥 NO Asistentes (NUEVO)
+            // No Asistentes
             noGuestsRef.once('value').then((snapshot) => {
                 const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
                 document.getElementById('totalNoAttending').textContent = noGuests.length;
@@ -360,14 +416,45 @@
                     ? diets.map((diet, i) => `<div class="guest-item">${i+1}. 🥗 ${diet}</div>`).join('')
                     : '<div class="guest-item">🥗 No hay dietas especiales</div>';
             });
+
+            // 🎵 CANCIONES (NUEVO)
+            songsRef.once('value').then((snapshot) => {
+                const songs = snapshot.val() ? Object.values(snapshot.val()) : [];
+                document.getElementById('totalSongs').textContent = songs.length;
+                document.getElementById('songsCount').textContent = songs.length;
+                
+                if (songs.length) {
+                    // Agrupar canciones por nombre para contar votos
+                    const songVotes = {};
+                    songs.forEach(song => {
+                        const [, songName] = song.split(': ', 2);
+                        songVotes[songName] = (songVotes[songName] || 0) + 1;
+                    });
+                    
+                    const sortedSongs = Object.entries(songVotes)
+                        .sort(([,a], [,b]) => b - a)
+                        .map(([songName, count], i) => 
+                            `<div class="guest-item song-item">
+                                <span class="song-name">${i+1}. ${songName}</span>
+                                <span class="song-count">${count} 🎵</span>
+                            </div>`
+                        ).join('');
+                    
+                    document.getElementById('songsList').innerHTML = sortedSongs;
+                } else {
+                    document.getElementById('songsList').innerHTML = 
+                        '<div class="guest-item song-item">🎵 ¡Aún no hay canciones pedidas!</div>';
+                }
+            });
         }
 
-        // LIMPIAR DATOS
+        // LIMPIAR DATOS (INCLUYE CANCIONES)
         function clearAllData() {
             if (confirm('⚠️ ¿Eliminar TODOS los datos?')) {
                 guestsRef.remove();
-                noGuestsRef.remove();  // 🔥 NUEVO
+                noGuestsRef.remove();
                 dietsRef.remove();
+                songsRef.remove(); // 🎵 NUEVO
                 alert('🗑️ Datos eliminados');
             }
         }
@@ -375,14 +462,4 @@
         // SALIR
         function logout() {
             document.getElementById('adminView').style.display = 'none';
-            document.getElementById('adminPasswordScreen').style.display = 'block';
-            document.getElementById('adminPassword').value = '';
-        }
-
-        // ENTER EN CONTRASEÑA
-        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') checkAdminPassword();
-        });
-    </script>
-</body>
-</html>
+            document.getElementById('adminPasswordScreen
