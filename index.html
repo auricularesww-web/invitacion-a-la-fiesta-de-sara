@@ -97,6 +97,16 @@
         transform: translateY(-3px) !important;
     }
 
+    /* 🎵 NUEVO: BOTÓN MÚSICA */
+    .btn-music {
+        background: linear-gradient(45deg, #28a745, #20c997) !important;
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3) !important;
+    }
+
+    .btn-music:hover {
+        box-shadow: 0 15px 30px rgba(40, 167, 69, 0.4) !important;
+    }
+
     .form-group {
         margin: 20px 0;
         display: none;
@@ -112,7 +122,7 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    input {
+    input, textarea {
         width: 100%;
         padding: 15px;
         border: 2px solid #e9ecef;
@@ -120,9 +130,15 @@
         font-size: 1.1em;
         margin: 10px 0;
         transition: border-color 0.3s ease;
+        resize: vertical;
     }
 
-    input:focus {
+    textarea {
+        height: 80px;
+        font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
         outline: none;
         border-color: #d63384;
         box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.1);
@@ -142,6 +158,20 @@
         background: #f8d7da !important;
         color: #721c24 !important;
         border: 1px solid #f5c6cb !important;
+    }
+
+    /* 🎵 NUEVO: ÉXITO CANCIÓN */
+    .song-success {
+        background: linear-gradient(45deg, #d4edda, #c3e6cb) !important;
+        color: #155724 !important;
+        border-left: 5px solid #28a745 !important;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
     }
 
     .links {
@@ -206,7 +236,6 @@
         .diet-options { grid-template-columns: 1fr; }
     }
 </style>
-
 </head>
 <body>
     <div class="container" id="mainContainer">
@@ -227,7 +256,7 @@
         <!-- ✅ BOTÓN VERDE -->
         <button class="btn" id="confirmBtn">✅ Confirmar Asistencia</button>
         
-        <!-- 🔥 NUEVO BOTÓN ROJO -->
+        <!-- 🔥 BOTÓN ROJO -->
         <button class="btn btn-no" id="noAttendBtn" onclick="noAttend()">❌ No podré asistir</button>
         
         <div class="form-group" id="nameForm">
@@ -240,10 +269,21 @@
             <br><strong id="savedName"></strong>
         </div>
 
+        <!-- 🎵 NUEVA SECCIÓN: BOTONES PRINCIPALES (CANCIÓN ANTES DE UBICACIÓN) -->
         <div id="mainButtons" style="display: none;">
+            <button class="btn btn-music" onclick="showSongForm()">🎵 Elegir Canción</button>
             <button class="btn" onclick="showDietForm()">🥗 Dieta Especial</button>
             <button class="btn" onclick="openMaps()">📍 Ver Ubicación</button>
             <button class="btn" onclick="backToWelcome()" style="background: #6c757d;">← Volver</button>
+        </div>
+
+        <!-- 🎵 NUEVO FORMULARIO CANCIÓN -->
+        <div class="form-group" id="songForm">
+            <h3>🎵 ¿Qué canción querés que suene en la fiesta?</h3>
+            <p style="color: #6c757d; margin-bottom: 20px;">¡Elegí tu favorita para el momento épico! 🎉</p>
+            <textarea id="songInput" placeholder="Ej: 'Despacito - Luis Fonsi' o 'La Mordidita - Ricky Martin'..." maxlength="100"></textarea>
+            <button class="btn btn-music" id="saveSongBtn" onclick="saveSong()" disabled>💾 Guardar Mi Canción</button>
+            <button class="btn" onclick="hideSongForm()" style="background: #6c757d;">Cancelar</button>
         </div>
 
         <div class="form-group" id="dietForm">
@@ -278,13 +318,15 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const guestsRef = db.ref('confirmedGuests');
-    const noGuestsRef = db.ref('noAttendingGuests'); // 🔥 NUEVA REFERENCIA
+    const noGuestsRef = db.ref('noAttendingGuests');
     const dietsRef = db.ref('specialDiets');
+    const songsRef = db.ref('partySongs'); // 🎵 NUEVA REFERENCIA
     
     let currentGuest = null;
     let selectedDiet = null;
+    let songSaved = false;
 
-    // 🔥 NUEVA FUNCIÓN: NO PODRÉ ASISTIR
+    // 🔥 FUNCIÓN NO ASISTIR
     function noAttend() {
         const name = prompt('😔 ¿Cómo te llamás?');
         if (name && name.trim()) {
@@ -318,22 +360,62 @@
 
     function resetForms() {
         document.getElementById('confirmBtn').style.display = 'block';
-        document.getElementById('noAttendBtn').style.display = 'block'; // 🔥 RESET
+        document.getElementById('noAttendBtn').style.display = 'block';
         document.getElementById('nameForm').classList.remove('active');
         document.getElementById('successMsg').style.display = 'none';
         document.getElementById('mainButtons').style.display = 'none';
         document.getElementById('dietForm').classList.remove('active');
+        document.getElementById('songForm').classList.remove('active');
         document.getElementById('fullName').value = '';
+        document.getElementById('songInput').value = '';
         selectedDiet = null;
+        songSaved = false;
         document.getElementById('saveDietBtn').disabled = true;
+        document.getElementById('saveSongBtn').disabled = true;
         document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
     }
 
     document.getElementById('confirmBtn').onclick = function() {
         document.getElementById('confirmBtn').style.display = 'none';
-        document.getElementById('noAttendBtn').style.display = 'none'; // 🔥 OCULTAR ROJO
+        document.getElementById('noAttendBtn').style.display = 'none';
         document.getElementById('nameForm').classList.add('active');
     };
+
+    // 🎵 NUEVAS FUNCIONES CANCIÓN
+    function showSongForm() {
+        if (!currentGuest) {
+            alert('😅 Primero confirmá tu asistencia');
+            return;
+        }
+        document.getElementById('songForm').classList.add('active');
+        document.getElementById('songInput').focus();
+    }
+
+    function hideSongForm() {
+        document.getElementById('songForm').classList.remove('active');
+        document.getElementById('songInput').value = '';
+        document.getElementById('saveSongBtn').disabled = true;
+    }
+
+    document.getElementById('songInput').addEventListener('input', function() {
+        document.getElementById('saveSongBtn').disabled = this.value.trim().length < 3;
+    });
+
+    function saveSong() {
+        const song = document.getElementById('songInput').value.trim();
+        if (song && currentGuest) {
+            songsRef.push(`${currentGuest}: ${song}`);
+            document.getElementById('successMsg').innerHTML = `
+                ✅ ¡Tu asistencia ha sido confirmada! Dress Code: Elegante sport 
+                <br><strong id="savedName">${currentGuest}</strong>
+                <br>🎵 Canción guardada: <strong>${song}</strong> ✨
+            `;
+            document.getElementById('successMsg').className = 'success song-success';
+            document.getElementById('successMsg').style.display = 'block';
+            hideSongForm();
+            songSaved = true;
+        }
+    }
 
     function selectDiet(diet) {
         selectedDiet = diet;
@@ -363,39 +445,4 @@
             guestsRef.once('value').then((snapshot) => {
                 const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
                 if (!guests.includes(name)) {
-                    guestsRef.push(name);
-                    currentGuest = name;
-                    document.getElementById('savedName').textContent = name;
-                    document.getElementById('successMsg').style.display = 'block';
-                    document.getElementById('nameForm').classList.remove('active');
-                    document.getElementById('mainButtons').style.display = 'block';
-                } else {
-                    alert('✅ ¡Ya estás confirmado!');
-                }
-            });
-        } else {
-            alert('Por favor, escribe tu nombre completo');
-        }
-    }
-
-    function saveDiet() {
-        if (selectedDiet && currentGuest) {
-            if (selectedDiet !== 'Ninguna') {
-                dietsRef.push(`${currentGuest}: ${selectedDiet}`);
-                alert('✅ ¡Dieta especial guardada!');
-            } else {
-                alert('✅ ¡Perfecto! No tienes restricciones dietéticas.');
-            }
-            hideDietForm();
-        } else {
-            alert('Por favor, selecciona una opción de dieta');
-        }
-    }
-
-    function openMaps() {
-        window.open('https://maps.app.goo.gl/E7KchiZa2uGNqmCW6?g_st=ac', '_blank');
-    }
-</script>
-
-</body>
-</html>
+                   
