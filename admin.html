@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
+
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -10,260 +12,181 @@
             padding: 0;
             box-sizing: border-box;
         }
+    body {
+        font-family: 'Arial', sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        background-size: cover;
+        background-attachment: fixed;
+        padding: 20px;
+        transition: background-image 0.5s ease;
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-            background-size: cover;
-            background-attachment: fixed;
-            padding: 20px;
-            transition: background-image 0.5s ease;
-        }
+    .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 40px;
+        max-width: 800px;
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+        animation: slideIn 0.8s ease-out;
+    }
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 40px;
-            max-width: 900px;
-            width: 100%;
-            margin: 0 auto;
-            text-align: center;
-            animation: slideIn 0.8s ease-out;
-        }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    h1 {
+        color: #d63384;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
 
-        h1 {
-            color: #d63384;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
+    .subtitle {
+        color: #6c757d;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+    }
 
-        .subtitle {
-            color: #6c757d;
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
+    .admin-section {
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px solid #e9ecef;
+    }
 
-        .admin-section {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid #e9ecef;
-        }
+    .admin-list {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: left;
+        max-height: 300px;
+        overflow-y: auto;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
 
-        .admin-list {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-            max-height: 300px;
-            overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
+    .admin-list h3 {
+        color: #d63384;
+        margin-bottom: 15px;
+        font-size: 1.3em;
+    }
 
-        .admin-list h3 {
-            color: #d63384;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
+    .guest-item {
+        padding: 12px;
+        margin: 8px 0;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #d63384;
+        font-size: 1.1em;
+    }
 
-        /* 🎵 Estilo especial para lista de canciones */
-        .admin-list.music-list h3 {
-            color: #28a745;
-            background: linear-gradient(45deg, #d4edda, #c3e6cb);
-            padding: 10px;
-            border-radius: 10px;
-            margin: -20px -20px 15px -20px;
-        }
+    /* 🔥 NUEVO: Estilo para NO asistentes (ROJO) */
+    .guest-item.no-attend {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        border-left: 4px solid #dc3545;
+        color: #721c24;
+        font-weight: 500;
+    }
 
-        .guest-item {
-            padding: 12px;
-            margin: 8px 0;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #d63384;
-            font-size: 1.1em;
-        }
+    .btn {
+        background: linear-gradient(45deg, #d63384, #e91e63);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1em;
+        border-radius: 50px;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(214, 51, 132, 0.3);
+        width: 280px;
+        max-width: 90%;
+    }
 
-        /* 🔥 Estilo para NO asistentes (ROJO) */
-        .guest-item.no-attend {
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-            border-left: 4px solid #dc3545;
-            color: #721c24;
-            font-weight: 500;
-        }
+    .btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(214, 51, 132, 0.4);
+    }
 
-        /* 🎵 Estilo para canciones individuales */
-        .guest-item.song-item {
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
-            border-left: 4px solid #28a745;
-            color: #155724;
-            font-weight: 500;
-            padding: 15px;
-            margin: 10px 0;
-        }
+    .btn.danger {
+        background: linear-gradient(45deg, #dc3545, #c82333);
+        width: 200px;
+    }
 
-        .song-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-        }
+    .btn.back, .btn.secondary {
+        background: #6c757d;
+        width: 200px;
+    }
 
-        .song-details {
-            flex: 1;
-        }
+    .btn.photo {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        width: 320px;
+        font-size: 1.2em;
+    }
 
-        .song-name {
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
+    /* 🔥 NUEVO: Stats para no asistentes */
+    .stats {
+        margin-top: 15px;
+        padding: 12px;
+        background: rgba(220, 53, 69, 0.1);
+        border-radius: 10px;
+        font-weight: bold;
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
 
-        .song-guest {
-            color: #28a745;
-            font-size: 0.95em;
-            background: rgba(40, 167, 69, 0.1);
-            padding: 3px 8px;
-            border-radius: 12px;
-            display: inline-block;
-        }
+    .password-form {
+        margin: 40px 0;
+    }
 
-        /* 🎵 Estilo para resumen de votos */
-        .song-vote-summary {
-            background: white;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 15px 0;
-            border-top: 3px solid #28a745;
-            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
-        }
+    .error, .success {
+        padding: 15px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-size: 1.1em;
+        display: none;
+    }
 
-        .vote-count {
-            background: #28a745;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 1.1em;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
+    .error {
+        background: #f8d7da;
+        color: #721c24;
+    }
 
-        .btn {
-            background: linear-gradient(45deg, #d63384, #e91e63);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1em;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(214, 51, 132, 0.3);
-            width: 280px;
-            max-width: 90%;
-        }
+    .success {
+        background: #d4edda;
+        color: #155724;
+    }
 
-        .btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(214, 51, 132, 0.4);
-        }
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        margin: 20px;
+    }
 
-        .btn.danger {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-            width: 200px;
-        }
+    .file-input {
+        display: none;
+    }
 
-        .btn.back, .btn.secondary {
-            background: #6c757d;
-            width: 200px;
-        }
+    #currentBg {
+        margin: 20px 0;
+        padding: 10px;
+        background: rgba(0,0,0,0.1);
+        border-radius: 10px;
+        font-family: monospace;
+        word-break: break-all;
+    }
 
-        .btn.photo {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            width: 320px;
-            font-size: 1.2em;
-        }
+    @media (max-width: 768px) {
+        .btn { width: 100%; max-width: none; }
+        .admin-list { max-height: 200px; }
+    }
+</style>
 
-        /* 🔥 Stats para no asistentes */
-        .stats {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(220, 53, 69, 0.1);
-            border-radius: 10px;
-            font-weight: bold;
-            color: #dc3545;
-            border-left: 4px solid #dc3545;
-        }
-
-        /* 🎵 Stats para canciones */
-        .music-stats {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(40, 167, 69, 0.1);
-            border-radius: 10px;
-            font-weight: bold;
-            color: #28a745;
-            border-left: 4px solid #28a745;
-        }
-
-        .password-form {
-            margin: 40px 0;
-        }
-
-        .error, .success {
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            font-size: 1.1em;
-            display: none;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            margin: 20px;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        #currentBg {
-            margin: 20px 0;
-            padding: 10px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 10px;
-            font-family: monospace;
-            word-break: break-all;
-        }
-
-        @media (max-width: 768px) {
-            .btn { width: 100%; max-width: none; }
-            .admin-list { max-height: 250px; }
-            .container { max-width: 100%; padding: 20px; }
-            .song-info { flex-direction: column; gap: 8px; }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -276,69 +199,58 @@
                 <div class="error" id="passwordError">❌ Contraseña incorrecta</div>
             </div>
         </div>
+    <!-- Vista de Administrador -->
+    <div id="adminView" style="display: none;">
+        <h1>🔐 Panel Administrador</h1>
+        <p class="subtitle">Control total de la fiesta 🎉</p>
 
-        <!-- Vista de Administrador -->
-        <div id="adminView" style="display: none;">
-            <h1>🔐 Panel Administrador</h1>
-            <p class="subtitle">Control total de la fiesta 🎉</p>
-
-            <!-- Sección de Fondo -->
-            <div class="admin-section">
-                <h3>🖼️ Cambiar Fondo de la Fiesta</h3>
-                <div id="currentBg">Fondo actual: Gradiente rosa por defecto</div>
-                <div class="file-input-wrapper">
-                    <input type="file" id="bgPhoto" class="file-input" accept="image/*">
-                    <button class="btn photo" onclick="document.getElementById('bgPhoto').click()">
-                        📸 Elegir Foto de Galería
-                    </button>
-                </div>
-                <div class="success" id="photoSuccess">✅ ¡Foto de fondo actualizada!</div>
+        <!-- Sección de Fondo -->
+        <div class="admin-section">
+            <h3>🖼️ Cambiar Fondo de la Fiesta</h3>
+            <div id="currentBg">Fondo actual: Gradiente rosa por defecto</div>
+            <div class="file-input-wrapper">
+                <input type="file" id="bgPhoto" class="file-input" accept="image/*">
+                <button class="btn photo" onclick="document.getElementById('bgPhoto').click()">
+                    📸 Elegir Foto de Galería
+                </button>
             </div>
-
-            <!-- 🔥 LISTA: NO ASISTENTES -->
-            <div class="admin-list">
-                <h3>😢 No asisten (<span id="totalNoAttending">0</span>)</h3>
-                <div id="noAttendingList">Cargando...</div>
-                <div class="stats">
-                    <span id="noAttendingCount">0</span> personas avisaron que no vienen
-                </div>
-            </div>
-
-            <!-- Lista Confirmados -->
-            <div class="admin-list">
-                <h3>📋 Confirmados (<span id="totalConfirmed">0</span>)</h3>
-                <div id="confirmedList">Cargando...</div>
-            </div>
-            
-            <!-- Lista Dietas -->
-            <div class="admin-list">
-                <h3>🥗 Dietas Especiales (<span id="totalDiets">0</span>)</h3>
-                <div id="dietList">Cargando...</div>
-            </div>
-
-            <!-- 🎵 LISTA CANCIONES CON NOMBRE DEL INVITADO -->
-            <div class="admin-list music-list">
-                <h3>🎵 Canciones para la Fiesta (<span id="totalSongs">0</span>)</h3>
-                <div id="songsList">Cargando...</div>
-                <div id="songsSummary"></div>
-                <div class="music-stats">
-                    <span id="songsCount">0</span> canciones pedidas 🎉 ¡Momento épico asegurado!
-                </div>
-            </div>
-
-            <!-- Botones de acción -->
-            <button class="btn danger" onclick="clearAllData()">🗑️ Limpiar Todo</button>
-            <button class="btn back" onclick="logout()">← Salir</button>
+            <div class="success" id="photoSuccess">✅ ¡Foto de fondo actualizada!</div>
         </div>
+
+        <!-- 🔥 NUEVA LISTA: NO ASISTENTES -->
+        <div class="admin-list">
+            <h3>😢 No asisten (<span id="totalNoAttending">0</span>)</h3>
+            <div id="noAttendingList">Cargando...</div>
+            <div class="stats">
+                <span id="noAttendingCount">0</span> personas avisaron que no vienen
+            </div>
+        </div>
+
+        <!-- Lista Confirmados -->
+        <div class="admin-list">
+            <h3>📋 Confirmados (<span id="totalConfirmed">0</span>)</h3>
+            <div id="confirmedList">Cargando...</div>
+        </div>
+        
+        <!-- Lista Dietas -->
+        <div class="admin-list">
+            <h3>🥗 Dietas Especiales (<span id="totalDiets">0</span>)</h3>
+            <div id="dietList">Cargando...</div>
+        </div>
+
+        <!-- Botones de acción -->
+        <button class="btn danger" onclick="clearAllData()">🗑️ Limpiar Todo</button>
+        <button class="btn back" onclick="logout()">← Salir</button>
     </div>
+</div>
 
-    <!-- 🔥 FIREBASE SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<!-- 🔥 FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
-    <script>
-        // 🔥 CONFIGURACIÓN FIREBASE
+<script>
+    // 🔥 CONFIGURACIÓN FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
         authDomain: "cumple-de-sara.firebaseapp.com",
@@ -473,5 +385,6 @@
         if (e.key === 'Enter') checkAdminPassword();
     });
 </script>
+
 </body>
 </html>
