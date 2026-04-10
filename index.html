@@ -86,7 +86,7 @@
         transform: none;
     }
 
-    /* 🔥 NUEVO: BOTÓN ROJO PARA NO ASISTIR */
+    /* 🔥 BOTÓN ROJO PARA NO ASISTIR */
     .btn-no {
         background: linear-gradient(45deg, #dc3545, #c82333) !important;
         box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3) !important;
@@ -97,14 +97,27 @@
         transform: translateY(-3px) !important;
     }
 
-    /* 🎵 NUEVO: BOTÓN MÚSICA */
+    /* 🎵 BOTÓN MÚSICA */
     .btn-music {
         background: linear-gradient(45deg, #28a745, #20c997) !important;
         box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3) !important;
     }
 
-    .btn-music:hover {
+    .btn-music:hover:not(:disabled) {
         box-shadow: 0 15px 30px rgba(40, 167, 69, 0.4) !important;
+    }
+
+    /* 🎵 BOTÓN CAMBIAR CANCIÓN */
+    .btn-change {
+        background: linear-gradient(45deg, #ffc107, #e0a800) !important;
+        box-shadow: 0 10px 20px rgba(255, 193, 7, 0.3) !important;
+        width: 200px;
+        font-size: 1em;
+        padding: 12px 20px;
+    }
+
+    .btn-change:hover {
+        box-shadow: 0 15px 30px rgba(255, 193, 7, 0.4) !important;
     }
 
     .form-group {
@@ -153,14 +166,14 @@
         display: none;
     }
 
-    /* 🔥 NUEVO: ÉXITO PARA NO ASISTIR */
+    /* 🔥 ÉXITO PARA NO ASISTIR */
     .no-attend-success {
         background: #f8d7da !important;
         color: #721c24 !important;
         border: 1px solid #f5c6cb !important;
     }
 
-    /* 🎵 NUEVO: ÉXITO CANCIÓN */
+    /* 🎵 ÉXITO CANCIÓN */
     .song-success {
         background: linear-gradient(45deg, #d4edda, #c3e6cb) !important;
         color: #155724 !important;
@@ -172,6 +185,39 @@
         0% { transform: scale(1); }
         50% { transform: scale(1.02); }
         100% { transform: scale(1); }
+    }
+
+    /* 🎵 CONTADOR DE CANCIONES */
+    .song-counter {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 25px;
+        margin: 10px 0;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .song-list {
+        background: #f8fff9;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+        max-height: 150px;
+        overflow-y: auto;
+        text-align: left;
+    }
+
+    .my-song {
+        background: white;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .links {
@@ -269,7 +315,7 @@
             <br><strong id="savedName"></strong>
         </div>
 
-        <!-- 🎵 NUEVA SECCIÓN: BOTONES PRINCIPALES (CANCIÓN ANTES DE UBICACIÓN) -->
+        <!-- 🎵 SECCIÓN BOTONES PRINCIPALES -->
         <div id="mainButtons" style="display: none;">
             <button class="btn btn-music" onclick="showSongForm()">🎵 Elegir Canción</button>
             <button class="btn" onclick="showDietForm()">🥗 Dieta Especial</button>
@@ -277,12 +323,20 @@
             <button class="btn" onclick="backToWelcome()" style="background: #6c757d;">← Volver</button>
         </div>
 
-        <!-- 🎵 NUEVO FORMULARIO CANCIÓN -->
+        <!-- 🎵 FORMULARIO CANCIÓN CON LÍMITE DE 2 -->
         <div class="form-group" id="songForm">
             <h3>🎵 ¿Qué canción querés que suene en la fiesta?</h3>
             <p style="color: #6c757d; margin-bottom: 20px;">¡Elegí tu favorita para el momento épico! 🎉</p>
+            
+            <!-- CONTADOR -->
+            <div class="song-counter" id="songCounter">📊 0/2 canciones</div>
+            
+            <!-- TUS CANCIONES -->
+            <div id="mySongsList" class="song-list" style="display: none;"></div>
+            
             <textarea id="songInput" placeholder="Ej: 'Despacito - Luis Fonsi' o 'La Mordidita - Ricky Martin'..." maxlength="100"></textarea>
-            <button class="btn btn-music" id="saveSongBtn" onclick="saveSong()" disabled>💾 Guardar Mi Canción</button>
+            <button class="btn btn-music" id="saveSongBtn" onclick="saveSong()" disabled>💾 Guardar Canción</button>
+            <button class="btn btn-change" id="changeSongBtn" onclick="showSongForm()" style="display: none;">✏️ Cambiar Canción</button>
             <button class="btn" onclick="hideSongForm()" style="background: #6c757d;">Cancelar</button>
         </div>
 
@@ -320,11 +374,11 @@
     const guestsRef = db.ref('confirmedGuests');
     const noGuestsRef = db.ref('noAttendingGuests');
     const dietsRef = db.ref('specialDiets');
-    const songsRef = db.ref('partySongs'); // 🎵 NUEVA REFERENCIA
+    const songsRef = db.ref('partySongs');
     
     let currentGuest = null;
     let selectedDiet = null;
-    let songSaved = false;
+    let mySongs = []; // 🎵 Array local para canciones del usuario
 
     // 🔥 FUNCIÓN NO ASISTIR
     function noAttend() {
@@ -369,9 +423,12 @@
         document.getElementById('fullName').value = '';
         document.getElementById('songInput').value = '';
         selectedDiet = null;
-        songSaved = false;
+        mySongs = [];
+        updateSongCounter();
         document.getElementById('saveDietBtn').disabled = true;
         document.getElementById('saveSongBtn').disabled = true;
+        document.getElementById('changeSongBtn').style.display = 'none';
+        document.getElementById('mySongsList').style.display = 'none';
         document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
     }
 
@@ -381,17 +438,20 @@
         document.getElementById('nameForm').classList.add('active');
     };
 
-    // 🎵 NUEVAS FUNCIONES CANCIÓN
+    // 🎵 FUNCIONES CANCIONES CON LÍMITE 2
     function showSongForm() {
         if (!currentGuest) {
             alert('😅 Primero confirmá tu asistencia');
             return;
         }
+        
+        loadMySongs(); // Cargar canciones existentes del usuario
         document.getElementById('songForm').classList.add('active');
         document.getElementById('songInput').focus();
+        updateSongUI();
     }
 
-    function hideSongForm() {
+     function hideSongForm() {
         document.getElementById('songForm').classList.remove('active');
         document.getElementById('songInput').value = '';
         document.getElementById('saveSongBtn').disabled = true;
