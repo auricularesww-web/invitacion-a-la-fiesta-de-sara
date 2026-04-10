@@ -27,7 +27,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             padding: 40px;
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
             text-align: center;
@@ -75,7 +75,7 @@
             font-size: 1.3em;
         }
 
-        /* 🎵 NUEVO: Estilo especial para canciones */
+        /* 🎵 Estilo especial para lista de canciones */
         .admin-list.music-list h3 {
             color: #28a745;
             background: linear-gradient(45deg, #d4edda, #c3e6cb);
@@ -101,29 +101,61 @@
             font-weight: 500;
         }
 
-        /* 🎵 Estilo para canciones */
+        /* 🎵 Estilo para canciones individuales */
         .guest-item.song-item {
             background: linear-gradient(135deg, #d4edda, #c3e6cb);
             border-left: 4px solid #28a745;
             color: #155724;
             font-weight: 500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
         }
 
-        .song-name {
+        .song-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .song-details {
             flex: 1;
         }
 
-        .song-count {
+        .song-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .song-guest {
+            color: #28a745;
+            font-size: 0.95em;
+            background: rgba(40, 167, 69, 0.1);
+            padding: 3px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        /* 🎵 Estilo para resumen de votos */
+        .song-vote-summary {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            border-top: 3px solid #28a745;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+        }
+
+        .vote-count {
             background: #28a745;
             color: white;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.9em;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-weight: bold;
-            min-width: 25px;
+            font-size: 1.1em;
+            display: inline-block;
+            margin-bottom: 8px;
         }
 
         .btn {
@@ -227,7 +259,9 @@
 
         @media (max-width: 768px) {
             .btn { width: 100%; max-width: none; }
-            .admin-list { max-height: 200px; }
+            .admin-list { max-height: 250px; }
+            .container { max-width: 100%; padding: 20px; }
+            .song-info { flex-direction: column; gap: 8px; }
         }
     </style>
 </head>
@@ -282,10 +316,11 @@
                 <div id="dietList">Cargando...</div>
             </div>
 
-            <!-- 🎵 NUEVA LISTA: CANCIONES PARA LA FIESTA -->
+            <!-- 🎵 LISTA CANCIONES CON NOMBRE DEL INVITADO -->
             <div class="admin-list music-list">
                 <h3>🎵 Canciones para la Fiesta (<span id="totalSongs">0</span>)</h3>
                 <div id="songsList">Cargando...</div>
+                <div id="songsSummary"></div>
                 <div class="music-stats">
                     <span id="songsCount">0</span> canciones pedidas 🎉 ¡Momento épico asegurado!
                 </div>
@@ -304,163 +339,130 @@
 
     <script>
         // 🔥 CONFIGURACIÓN FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
-            authDomain: "cumple-de-sara.firebaseapp.com",
-            databaseURL: "https://cumple-de-sara-default-rtdb.firebaseio.com",
-            projectId: "cumple-de-sara",
-            storageBucket: "cumple-de-sara.firebasestorage.app",
-            messagingSenderId: "552258745730",
-            appId: "1:552258745730:web:e9fe5ec73e1dbf7bcb4b9b"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyC7DN_UnzpCnkWZxmgHDsXBTefx0DOZ-Pc",
+        authDomain: "cumple-de-sara.firebaseapp.com",
+        databaseURL: "https://cumple-de-sara-default-rtdb.firebaseio.com",
+        projectId: "cumple-de-sara",
+        storageBucket: "cumple-de-sara.firebasestorage.app",
+        messagingSenderId: "552258745730",
+        appId: "1:552258745730:web:e9fe5ec73e1dbf7bcb4b9b"
+    };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const storage = firebase.storage();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const storage = firebase.storage();
 
-        // 🔥 REFERENCIAS (AGREGADA songsRef)
-        const guestsRef = db.ref('confirmedGuests');
-        const noGuestsRef = db.ref('noAttendingGuests');
-        const dietsRef = db.ref('specialDiets');
-        const songsRef = db.ref('partySongs'); // 🎵 NUEVA
-        const bgRef = db.ref('backgroundUrl');
-        const ADMIN_PASSWORD = "Sara2026";
+    // 🔥 REFERENCIAS (AGREGADA la de no asistentes)
+    const guestsRef = db.ref('confirmedGuests');
+    const noGuestsRef = db.ref('noAttendingGuests');  // 🔥 NUEVA
+    const dietsRef = db.ref('specialDiets');
+    const bgRef = db.ref('backgroundUrl');
+    const ADMIN_PASSWORD = "Sara2026";
 
-        // SINCRONIZACIÓN EN TIEMPO REAL
-        guestsRef.on('value', updateAdminLists);
-        noGuestsRef.on('value', updateAdminLists);
-        dietsRef.on('value', updateAdminLists);
-        songsRef.on('value', updateAdminLists); // 🎵 NUEVA
-        bgRef.on('value', (snapshot) => {
+    // SINCRONIZACIÓN EN TIEMPO REAL
+    guestsRef.on('value', updateAdminLists);
+    noGuestsRef.on('value', updateAdminLists);  // 🔥 NUEVA
+    dietsRef.on('value', updateAdminLists);
+    bgRef.on('value', (snapshot) => {
+        const url = snapshot.val();
+        if (url) {
+            document.body.style.backgroundImage = `url(${url})`;
+            document.getElementById('currentBg').textContent = `Fondo actual: ${url}`;
+        }
+    });
+
+    // VER FONDO ACTUAL AL CARGAR
+    window.onload = function() {
+        bgRef.once('value').then((snapshot) => {
             const url = snapshot.val();
             if (url) {
-                document.body.style.backgroundImage = `url(${url})`;
                 document.getElementById('currentBg').textContent = `Fondo actual: ${url}`;
             }
         });
+    };
 
-        // VER FONDO ACTUAL AL CARGAR
-        window.onload = function() {
-            bgRef.once('value').then((snapshot) => {
-                const url = snapshot.val();
-                if (url) {
-                    document.getElementById('currentBg').textContent = `Fondo actual: ${url}`;
-                }
-            });
-        };
-
-        // CONTRASEÑA ADMIN
-        function checkAdminPassword() {
-            const password = document.getElementById('adminPassword').value;
-            if (password === ADMIN_PASSWORD) {
-                document.getElementById('adminPasswordScreen').style.display = 'none';
-                document.getElementById('adminView').style.display = 'block';
-                document.getElementById('adminPassword').value = '';
-                updateAdminLists();
-            } else {
-                document.getElementById('passwordError').style.display = 'block';
-                setTimeout(() => document.getElementById('passwordError').style.display = 'none', 3000);
-            }
+    // CONTRASEÑA ADMIN
+    function checkAdminPassword() {
+        const password = document.getElementById('adminPassword').value;
+        if (password === ADMIN_PASSWORD) {
+            document.getElementById('adminPasswordScreen').style.display = 'none';
+            document.getElementById('adminView').style.display = 'block';
+            document.getElementById('adminPassword').value = '';
+            updateAdminLists();
+        } else {
+            document.getElementById('passwordError').style.display = 'block';
+            setTimeout(() => document.getElementById('passwordError').style.display = 'none', 3000);
         }
+    }
 
-        // SUBIR FOTO DE FONDO
-        document.getElementById('bgPhoto').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const storageRef = storage.ref('backgrounds/' + file.name);
-                const uploadTask = storageRef.put(file);
+    // SUBIR FOTO DE FONDO
+    document.getElementById('bgPhoto').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const storageRef = storage.ref('backgrounds/' + file.name);
+            const uploadTask = storageRef.put(file);
 
-                uploadTask.on('state_changed',
-                    (snapshot) => { /* Progreso */ },
-                    (error) => { alert('❌ Error: ' + error.message); },
-                    () => {
-                        storageRef.getDownloadURL().then((url) => {
-                            bgRef.set(url);
-                            document.getElementById('photoSuccess').style.display = 'block';
-                            setTimeout(() => {
-                                document.getElementById('photoSuccess').style.display = 'none';
-                            }, 3000);
-                            document.getElementById('currentBg').textContent = `Fondo actual: ${url}`;
-                        });
-                    }
-                );
-            }
+            uploadTask.on('state_changed',
+                (snapshot) => { /* Progreso */ },
+                (error) => { alert('❌ Error: ' + error.message); },
+                () => {
+                    storageRef.getDownloadURL().then((url) => {
+                        bgRef.set(url);
+                        document.getElementById('photoSuccess').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('photoSuccess').style.display = 'none';
+                        }, 3000);
+                        document.getElementById('currentBg').textContent = `Fondo actual: ${url}`;
+                    });
+                }
+            );
+        }
+    });
+
+    // 🔥 FUNCIÓN ACTUALIZADA: Incluye NO asistentes
+    function updateAdminLists() {
+        // Confirmados
+        guestsRef.once('value').then((snapshot) => {
+            const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
+            document.getElementById('totalConfirmed').textContent = guests.length;
+            document.getElementById('confirmedList').innerHTML = guests.length 
+                ? guests.map((name, i) => `<div class="guest-item">${i+1}. 👤 ${name}</div>`).join('')
+                : '<div class="guest-item">👤 No hay confirmaciones aún</div>';
         });
 
-        // 🔥 FUNCIÓN ACTUALIZADA: Incluye CANCIONES
-        function updateAdminLists() {
-            // Confirmados
-            guestsRef.once('value').then((snapshot) => {
-                const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
-                document.getElementById('totalConfirmed').textContent = guests.length;
-                document.getElementById('confirmedList').innerHTML = guests.length 
-                    ? guests.map((name, i) => `<div class="guest-item">${i+1}. 👤 ${name}</div>`).join('')
-                    : '<div class="guest-item">👤 No hay confirmaciones aún</div>';
-            });
+        // 🔥 NO Asistentes (NUEVO)
+        noGuestsRef.once('value').then((snapshot) => {
+            const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
+            document.getElementById('totalNoAttending').textContent = noGuests.length;
+            document.getElementById('noAttendingList').innerHTML = noGuests.length 
+                ? noGuests.map((name, i) => `<div class="guest-item no-attend">${i+1}. ❌ ${name}</div>`).join('')
+                : '<div class="guest-item no-attend">😊 Nadie avisó que no viene aún</div>';
+            document.getElementById('noAttendingCount').textContent = noGuests.length;
+        });
 
-            // No Asistentes
-            noGuestsRef.once('value').then((snapshot) => {
-                const noGuests = snapshot.val() ? Object.values(snapshot.val()) : [];
-                document.getElementById('totalNoAttending').textContent = noGuests.length;
-                document.getElementById('noAttendingList').innerHTML = noGuests.length 
-                    ? noGuests.map((name, i) => `<div class="guest-item no-attend">${i+1}. ❌ ${name}</div>`).join('')
-                    : '<div class="guest-item no-attend">😊 Nadie avisó que no viene aún</div>';
-                document.getElementById('noAttendingCount').textContent = noGuests.length;
-            });
+        // Dietas
+        dietsRef.once('value').then((snapshot) => {
+            const diets = snapshot.val() ? Object.values(snapshot.val()) : [];
+            document.getElementById('totalDiets').textContent = diets.length;
+            document.getElementById('dietList').innerHTML = diets.length 
+                ? diets.map((diet, i) => `<div class="guest-item">${i+1}. 🥗 ${diet}</div>`).join('')
+                : '<div class="guest-item">🥗 No hay dietas especiales</div>';
+        });
+    }
 
-            // Dietas
-            dietsRef.once('value').then((snapshot) => {
-                const diets = snapshot.val() ? Object.values(snapshot.val()) : [];
-                document.getElementById('totalDiets').textContent = diets.length;
-                document.getElementById('dietList').innerHTML = diets.length 
-                    ? diets.map((diet, i) => `<div class="guest-item">${i+1}. 🥗 ${diet}</div>`).join('')
-                    : '<div class="guest-item">🥗 No hay dietas especiales</div>';
-            });
-
-            // 🎵 CANCIONES (NUEVO)
-            songsRef.once('value').then((snapshot) => {
-                const songs = snapshot.val() ? Object.values(snapshot.val()) : [];
-                document.getElementById('totalSongs').textContent = songs.length;
-                document.getElementById('songsCount').textContent = songs.length;
-                
-                if (songs.length) {
-                    // Agrupar canciones por nombre para contar votos
-                    const songVotes = {};
-                    songs.forEach(song => {
-                        const [, songName] = song.split(': ', 2);
-                        songVotes[songName] = (songVotes[songName] || 0) + 1;
-                    });
-                    
-                    const sortedSongs = Object.entries(songVotes)
-                        .sort(([,a], [,b]) => b - a)
-                        .map(([songName, count], i) => 
-                            `<div class="guest-item song-item">
-                                <span class="song-name">${i+1}. ${songName}</span>
-                                <span class="song-count">${count} 🎵</span>
-                            </div>`
-                        ).join('');
-                    
-                    document.getElementById('songsList').innerHTML = sortedSongs;
-                } else {
-                    document.getElementById('songsList').innerHTML = 
-                        '<div class="guest-item song-item">🎵 ¡Aún no hay canciones pedidas!</div>';
-                }
-            });
+    // LIMPIAR DATOS
+    function clearAllData() {
+        if (confirm('⚠️ ¿Eliminar TODOS los datos?')) {
+            guestsRef.remove();
+            noGuestsRef.remove();  // 🔥 NUEVO
+            dietsRef.remove();
+            alert('🗑️ Datos eliminados');
         }
+    }
 
-        // LIMPIAR DATOS (INCLUYE CANCIONES)
-        function clearAllData() {
-            if (confirm('⚠️ ¿Eliminar TODOS los datos?')) {
-                guestsRef.remove();
-                noGuestsRef.remove();
-                dietsRef.remove();
-                songsRef.remove(); // 🎵 NUEVO
-                alert('🗑️ Datos eliminados');
-            }
-        }
-
-        // SALIR
-        function logout() {
+    // SALIR
+    function logout() {
         document.getElementById('adminView').style.display = 'none';
         document.getElementById('adminPasswordScreen').style.display = 'block';
         document.getElementById('adminPassword').value = '';
@@ -471,6 +473,5 @@
         if (e.key === 'Enter') checkAdminPassword();
     });
 </script>
-
 </body>
 </html>
