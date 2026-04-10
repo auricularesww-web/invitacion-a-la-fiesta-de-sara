@@ -461,5 +461,16 @@
 
         // SALIR
         function logout() {
-            document.getElementById('adminView').style.display = 'none';
-            document.getElementById('adminPasswordScreen
+        document.getElementById('adminView').style.display = 'none';
+        document.getElementById('adminPasswordScreen').style.display = 'block';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    // ENTER EN CONTRASEÑA
+    document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') checkAdminPassword();
+    });
+</script>
+
+</body>
+</html>
