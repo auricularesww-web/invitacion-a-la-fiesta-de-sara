@@ -439,13 +439,44 @@
         document.querySelectorAll('.diet-option').forEach(opt => opt.classList.remove('selected'));
     }
 
-    function saveGuest() {
+   function saveGuest() {
         const name = document.getElementById('fullName').value.trim();
         if (name) {
-            guestsRef.once('value').then(snapshot)
+            guestsRef.once('value').then((snapshot) => {
                 const guests = snapshot.val() ? Object.values(snapshot.val()) : [];
                 if (!guests.includes(name)) {
+                    guestsRef.push(name);
+                    currentGuest = name;
+                    document.getElementById('savedName').textContent = name;
+                    document.getElementById('successMsg').style.display = 'block';
+                    document.getElementById('nameForm').classList.remove('active');
+                    document.getElementById('mainButtons').style.display = 'block';
+                } else {
+                    alert('✅ ¡Ya estás confirmado!');
                 }
-            }
+            });
+        } else {
+            alert('Por favor, escribe tu nombre completo');
         }
-    
+    }
+
+    function saveDiet() {
+        if (selectedDiet && currentGuest) {
+            if (selectedDiet !== 'Ninguna') {
+                dietsRef.push(`${currentGuest}: ${selectedDiet}`);
+                alert('✅ ¡Dieta especial guardada!');
+            } else {
+                alert('✅ ¡Perfecto! No tienes restricciones dietéticas.');
+            }
+            hideDietForm();
+        } else {
+            alert('Por favor, selecciona una opción de dieta');
+        }
+    }
+
+    function openMaps() {
+        window.open('https://maps.app.goo.gl/E7KchiZa2uGNqmCW6?g_st=ac', '_blank');
+    }
+</script>
+</body>
+</html>
